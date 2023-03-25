@@ -1,9 +1,6 @@
 name: Format
 
 on:
-  push:
-    branches:
-      - "*"
   pull_request:
     branches: [main]
 
@@ -14,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.head_ref }}
       - name: Use Node.js 19.x
         uses: actions/setup-node@v3
         with:
@@ -25,4 +22,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Apply formatting changes
-          branch: ${{ github.ref }}
+          branch: ${{ github.head_ref }}
