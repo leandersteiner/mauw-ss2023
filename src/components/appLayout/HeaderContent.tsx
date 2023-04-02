@@ -12,7 +12,7 @@ const HeaderContent: React.FC<HeaderContentProps> = (props: HeaderContentProps) 
     <>
       <span style={{ paddingLeft: 10, paddingRight: 10 }}>
         <Button
-          icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined></MenuFoldOutlined>}
+          icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
         ></Button>
       </span>

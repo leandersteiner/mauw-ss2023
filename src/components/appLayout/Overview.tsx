@@ -6,7 +6,7 @@ import SideMenu from './SideMenu';
 const Overview: React.FC = () => {
   const [isMenuFolded, setIsMenuFolded] = useState(false);
 
-  const sideMenu = <SideMenu></SideMenu>;
+  const sideMenu = <SideMenu />;
 
   const headerContent = (
     <HeaderContent isMenuFolded={isMenuFolded} setIsMenuFolded={setIsMenuFolded} />
