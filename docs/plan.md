@@ -19,9 +19,9 @@
   - (github)
 
 - Board
-- id
-- state
-- title
+  - id
+  - state
+  - title
   - tasks: Task[]
 
 - Task
