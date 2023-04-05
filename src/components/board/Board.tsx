@@ -4,5 +4,9 @@ type BoardProps = {
 };
 
 export const Board = (props: BoardProps) => {
-  return <div>{props.title}</div>;
+  return (
+    <div>
+      {props.title} - {props.id}
+    </div>
+  );
 };
