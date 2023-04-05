@@ -33,7 +33,7 @@ export const SideMenu: React.FC = () => {
             label: 'nav 3'
           }
         ]}
-      ></Menu>
+      />
     </>
   );
 };
