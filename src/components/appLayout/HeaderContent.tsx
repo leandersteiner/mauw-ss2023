@@ -17,7 +17,7 @@ export const HeaderContent: React.FC<HeaderContentProps> = (props: HeaderContent
     <>
       <span style={buttonWrapperStyle}>
         <Button
-          icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined></MenuFoldOutlined>}
+          icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
         ></Button>
       </span>
