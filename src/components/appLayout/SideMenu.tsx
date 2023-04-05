@@ -1,10 +1,17 @@
 import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
+import { CSSProperties } from 'react';
 
-const SideMenu: React.FC = () => {
+export const SideMenu: React.FC = () => {
+  const menuWrapperStyle: CSSProperties = {
+    height: 32,
+    margin: 16,
+    background: 'rgba(255, 255, 255, 0.2)'
+  };
+
   return (
     <>
-      <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
+      <div style={menuWrapperStyle} />
       <Menu
         theme='dark'
         mode='inline'
@@ -30,5 +37,3 @@ const SideMenu: React.FC = () => {
     </>
   );
 };
-
-export default SideMenu;

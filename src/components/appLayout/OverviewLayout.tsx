@@ -1,6 +1,5 @@
-import * as React from 'react';
 import { Layout, theme } from 'antd';
-import { ReactNode } from 'react';
+import { ReactNode, CSSProperties } from 'react';
 
 const { Header, Sider, Content } = Layout;
 
@@ -11,21 +10,21 @@ type OverviewLayoutProps = {
   isMenuFolded: boolean;
 };
 
-const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLayoutProps) => {
+export const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLayoutProps) => {
   const {
     token: { colorBgContainer }
   } = theme.useToken();
 
-  const layoutStyle = {
+  const layoutStyle: CSSProperties = {
     height: '100vh'
   };
 
-  const contentStyle = {
+  const contentStyle: CSSProperties = {
     margin: '24px 16px',
     padding: 24
   };
 
-  const headerStyle = {
+  const headerStyle: CSSProperties = {
     padding: 0,
     background: colorBgContainer
   };
@@ -44,5 +43,3 @@ const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLayoutProp
     </Layout>
   );
 };
-
-export default OverviewLayout;
