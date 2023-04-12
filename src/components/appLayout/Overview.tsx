@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { HeaderContent } from './HeaderContent';
 import { OverviewLayout } from './OverviewLayout';
-import { SideMenu } from './SideMenu';
+import { SideMenu, SideMenuEntry } from './SideMenu';
+import { UploadOutlined } from '@ant-design/icons';
 
 export const Overview: React.FC = () => {
   const [isMenuFolded, setIsMenuFolded] = useState(false);
 
-  const sideMenu = <SideMenu />;
+  const entry: SideMenuEntry = {
+    label: 'Home',
+    icon: <UploadOutlined></UploadOutlined>
+  };
+
+  const topMenuEntries: SideMenuEntry[] = Array.of(entry);
+
+  const sideMenu = <SideMenu topItems={topMenuEntries} bottomItems={topMenuEntries} />;
 
   const headerContent = (
     <HeaderContent isMenuFolded={isMenuFolded} setIsMenuFolded={setIsMenuFolded} />
