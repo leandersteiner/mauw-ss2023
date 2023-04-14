@@ -18,13 +18,15 @@ function createMenuItem(
   label: React.ReactNode,
   key: React.Key,
   icon?: React.ReactNode,
-  children?: MenuItem[]
+  children?: MenuItem[],
+  disabled?: boolean
 ): MenuItem {
   return {
     key,
     icon,
     children,
-    label
+    label,
+    disabled
   } as MenuItem;
 }
 
@@ -58,21 +60,27 @@ export const SideMenu: React.FC<SideMenuProps> = (props: SideMenuProps) => {
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'column',
-    height: '100%'
+    height: '90%'
   };
 
   const bottomMenuStyle: CSSProperties = {
     marginBottom: 'auto'
   };
 
+  const logo: CSSProperties = {
+    height: 32,
+    margin: 17,
+    background: 'rgba(255, 255, 255, 0.2)'
+  };
+
   return (
     <>
       <div style={menuWrapperStyle}>
+        <div style={logo} />
         <div style={menuContatinerStyle}>
           <div>
             <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']} items={topItems}></Menu>
           </div>
-
           <div>
             <Menu style={bottomMenuStyle} theme='dark' mode='inline' items={bottomItems}></Menu>
           </div>
