@@ -1,10 +1,10 @@
-import { StrictMode } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './App';
+import { Overview } from './components/appLayout/Overview';
 
 const root = createRoot(document.getElementById('root') as Element);
 root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <React.StrictMode>
+    <Overview />
+  </React.StrictMode>
 );
