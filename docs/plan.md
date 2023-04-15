@@ -1,33 +1,51 @@
 # Plan
 
 - User
+
   - Id
   - username
   - password
 
 - Team
+
   - id
   - name
   - private
+  - owner: User
+  - members: User[]
+  - projects: Project[]
 
-- Projects
+- Project
+
   - id
-  - owner: Team|User
-  - member: User[]
-  - boards: Board[]
+  - name
   - private
-  - (github)
+  - team: Team
+  - boards: Board[]
+  - members: User[]
+  - taskStates: TaskState[]
+  - sprints: Sprint[]
 
 - Board
+
   - id
-  - state
   - title
+  - project: Project
+  - columns: BoardColumn[]
+
+- BoardColumn
+
+  - id
+  - title
+  - state: TaskState
   - tasks: Task[]
 
 - Task
+
   - id
-  - title
+  - name
   - description
+  - done
   - assignee: User
   - priority
   - state
@@ -36,9 +54,23 @@
   - (pull-request)
 
 - Sprint
+
   - id
   - start
   - end
+
+- Organization
+
+  - id
+  - name
+  - teams: Team[]
+
+- Comment
+
+  - id
+  - comment
+  - task: Task
+  - creator: User
 
 - Sprints are optional
 - Sprints are mainly for organizing tasks
@@ -51,5 +83,11 @@
 - Task Overview (create, update)
 - Sprint Overview
 - Boards
- - Tasks
+- Tasks
 - Settings
+
+## Settings
+
+### Project / Team
+
+- set default sprint duration
