@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { HeaderContent } from './header/HeaderContent';
 import { OverviewLayout } from './OverviewLayout';
-import { SideMenu } from './sideMenu/SideMenu';
-import { createBottomSideMenuEntries, createTopSideMenuEntries } from './sideMenu/SideMenuEntries';
+import { SideMenu } from './side-menu/SideMenu';
+import { createBottomSideMenuEntries, createTopSideMenuEntries } from './side-menu/SideMenuEntries';
 
 export const Overview: React.FC = () => {
   const [isMenuFolded, setIsMenuFolded] = useState(false);
