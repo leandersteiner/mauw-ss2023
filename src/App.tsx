@@ -9,8 +9,11 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path='/home' element={<Overview />}>
-          <Route path='overview' element={<DatePicker />} />
+        <Route path='/login' element={<Overview />} />
+        <Route path='/home/:userId' element={<Overview />}>
+          <Route path='boards' element={<DatePicker />} />
+          <Route path='settings' element={<DatePicker />} />
+          <Route path='create-project' element={<DatePicker />} />
         </Route>
       </Routes>
     </BrowserRouter>
