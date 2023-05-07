@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router';
 import { HeaderContent } from './HeaderContent';
 import { OverviewLayout } from './OverviewLayout';
 import { SideMenu } from './SideMenu';
-import { Outlet } from 'react-router';
 
 export const Overview: React.FC = () => {
   const [isMenuFolded, setIsMenuFolded] = useState(false);
@@ -17,7 +17,7 @@ export const Overview: React.FC = () => {
     <OverviewLayout
       menu={sideMenu}
       headerContent={headerContent}
-      content={<Outlet></Outlet>}
+      content={<Outlet />}
       isMenuFolded={isMenuFolded}
     />
   );
