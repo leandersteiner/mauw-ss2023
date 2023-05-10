@@ -1,6 +1,7 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { CSSProperties } from 'react';
+import { CSSProperties, useContext } from 'react';
+import { usePathContext } from '../../context/PathContext';
 
 type HeaderContentProps = {
   isMenuFolded: boolean;
@@ -13,15 +14,17 @@ export const HeaderContent: React.FC<HeaderContentProps> = (props: HeaderContent
     paddingRight: 10
   };
 
+  const { path } = usePathContext();
+
   return (
     <>
       <span style={buttonWrapperStyle}>
         <Button
           icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
-        ></Button>
+        />
       </span>
-      <span>Projects / ls / mauw</span>
+      <span>{path}</span>
     </>
   );
 };

@@ -4,16 +4,14 @@
     "es6": true
   },
   "extends": [
-    "eslint:recommended",
-    "airbnb/hooks",
+    "airbnb",
     "airbnb-typescript",
+    "airbnb/hooks",
     "plugin:react/recommended",
-    "plugin:react/jsx-runtime",
     "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:prettier/recommended",
-    "plugin:import/recommended"
+    "plugin:prettier/recommended"
   ],
+  "overrides": [],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
@@ -24,32 +22,21 @@
     "tsconfigRootDir": ".",
     "project": ["./tsconfig.json"]
   },
-  "plugins": ["react", "@typescript-eslint", "import", "jsx-a11y", "react-hooks", "prettier"],
-  "settings": {
-    "import/resolver": {
-      "typescript": {
-        "project": "./tsconfig.json"
-      }
-    },
-    "react": {
-      "version": "18.x"
-    }
-  },
+  "plugins": ["react", "@typescript-eslint", "prettier"],
   "rules": {
-    "linebreak-style": "off",
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/ban-types": [
-      "error",
-      {
-        "extendDefaults": true,
-        "types": {
-          "{}": false
-        }
-      }
-    ],
-    "react-hooks/exhaustive-deps": "warn",
     "react-hooks/rules-of-hooks": "error",
     "object-shorthand": "error",
-    "no-console": "warn"
+    "no-console": "warn",
+    "import/prefer-default-export": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/function-component-definition": [
+      2,
+      { "namedComponents": "arrow-function", "unnamedComponents": "arrow-function" }
+    ],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "react/require-default-props": "off",
+    "react/destructuring-assignment": "off",
+    "consistent-return": "warn"
   }
 }

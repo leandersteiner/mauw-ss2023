@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { HeaderContent } from './header/HeaderContent';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router';
+import { HeaderContent } from './HeaderContent';
 import { OverviewLayout } from './OverviewLayout';
 import { SideMenu } from './side-menu/SideMenu';
 import { createBottomSideMenuEntries, createTopSideMenuEntries } from './side-menu/SideMenuEntries';
@@ -16,6 +19,11 @@ export const Overview: React.FC = () => {
   );
 
   return (
-    <OverviewLayout menu={sideMenu} headerContent={headerContent} isMenuFolded={isMenuFolded} />
+    <OverviewLayout
+      menu={sideMenu}
+      headerContent={headerContent}
+      content={<Outlet />}
+      isMenuFolded={isMenuFolded}
+    />
   );
 };
