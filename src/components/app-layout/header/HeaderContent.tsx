@@ -1,7 +1,7 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { CSSProperties, useContext } from 'react';
-import { usePathContext } from '../../context/PathContext';
+import { CSSProperties } from 'react';
+import { usePathContext } from '../../../context/PathContext';
 
 type HeaderContentProps = {
   isMenuFolded: boolean;

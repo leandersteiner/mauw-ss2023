@@ -1,8 +1,8 @@
 import React from 'react';
 import { DatePicker } from 'antd';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Overview } from './components/appLayout/Overview';
 import { PathContextProvider } from './context/PathContext';
+import { Overview } from './components/app-layout/Overview';
 
 export const App: React.FC = () => {
   return (

@@ -1,17 +1,12 @@
 import { Menu } from 'antd';
 import { CSSProperties } from 'react';
-import { MenuItem, SideMenuEntry, toMenuItemArray } from './SideMenuEntries';
+import { MenuItem, toMenuItemArray } from './SideMenuUtils';
+import { createBottomSideMenuEntries, createTopSideMenuEntries } from './SideMenuEntries';
 
-type SideMenuProps = {
-  topItems?: SideMenuEntry[];
-  bottomItems?: SideMenuEntry[];
-};
+export const SideMenu: React.FC = () => {
+  const topItems: MenuItem[] = toMenuItemArray(createTopSideMenuEntries());
 
-export const SideMenu: React.FC<SideMenuProps> = (props: SideMenuProps) => {
-  const topItems: MenuItem[] = props.topItems != null ? toMenuItemArray(props.topItems) : [];
-
-  const bottomItems: MenuItem[] =
-    props.bottomItems != null ? toMenuItemArray(props.bottomItems) : [];
+  const bottomItems: MenuItem[] = toMenuItemArray(createBottomSideMenuEntries());
 
   const menuWrapperStyle: CSSProperties = {
     overflow: 'auto',
