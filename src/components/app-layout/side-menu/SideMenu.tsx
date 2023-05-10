@@ -1,12 +1,14 @@
 import { Menu } from 'antd';
 import { CSSProperties } from 'react';
+import { useNavigate } from 'react-router';
 import { MenuItem, toMenuItemArray } from './SideMenuUtils';
 import { createBottomSideMenuEntries, createTopSideMenuEntries } from './SideMenuEntries';
 
 export const SideMenu: React.FC = () => {
-  const topItems: MenuItem[] = toMenuItemArray(createTopSideMenuEntries());
+  const navigator = useNavigate();
 
-  const bottomItems: MenuItem[] = toMenuItemArray(createBottomSideMenuEntries());
+  const topItems: MenuItem[] = toMenuItemArray(createTopSideMenuEntries(), navigator);
+  const bottomItems: MenuItem[] = toMenuItemArray(createBottomSideMenuEntries(), navigator);
 
   const menuWrapperStyle: CSSProperties = {
     overflow: 'auto',
@@ -31,18 +33,16 @@ export const SideMenu: React.FC = () => {
   };
 
   return (
-    <>
-      <div style={menuWrapperStyle}>
-        <div style={logo}></div>
-        <div style={menuContatinerStyle}>
-          <div>
-            <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']} items={topItems}></Menu>
-          </div>
-          <div>
-            <Menu style={bottomMenuStyle} theme='dark' mode='inline' items={bottomItems}></Menu>
-          </div>
+    <div style={menuWrapperStyle}>
+      <div style={logo} />
+      <div style={menuContatinerStyle}>
+        <div>
+          <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']} items={topItems} />
+        </div>
+        <div>
+          <Menu style={bottomMenuStyle} theme='dark' mode='inline' items={bottomItems} />
         </div>
       </div>
-    </>
+    </div>
   );
 };

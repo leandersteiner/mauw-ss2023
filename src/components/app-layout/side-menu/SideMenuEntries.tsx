@@ -3,23 +3,26 @@ import { SideMenuEntry } from './SideMenuUtils';
 
 const home: SideMenuEntry = {
   label: 'Home',
-  icon: <HomeOutlined />
+  icon: <HomeOutlined />,
+  url: '/home/123/boards'
 };
 
 const projects: SideMenuEntry = {
   label: 'Projects',
-  icon: <ProjectOutlined />
+  icon: <ProjectOutlined />,
+  url: '/home/123'
 };
 
 const settings: SideMenuEntry = {
   label: 'Settings',
-  icon: <SettingOutlined />
+  icon: <SettingOutlined />,
+  url: '/home/123'
 };
 
 const createProject: SideMenuEntry = {
   label: 'Create Project',
   icon: <PlusOutlined />,
-  onClick: () => { }
+  url: '/home/123'
 };
 
 export function createTopSideMenuEntries(): SideMenuEntry[] {
