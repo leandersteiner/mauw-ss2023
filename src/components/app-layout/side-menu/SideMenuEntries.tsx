@@ -22,7 +22,7 @@ const settings: SideMenuEntry = {
 const createProject: SideMenuEntry = {
   label: 'Create Project',
   icon: <PlusOutlined />,
-  url: '/home/123'
+  url: '/home/123/create-project'
 };
 
 export function createTopSideMenuEntries(): SideMenuEntry[] {

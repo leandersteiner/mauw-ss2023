@@ -37,7 +37,7 @@ export const SideMenu: React.FC = () => {
       <div style={logo} />
       <div style={menuContatinerStyle}>
         <div>
-          <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']} items={topItems} />
+          <Menu theme='dark' mode='inline' defaultSelectedKeys={['0']} items={topItems} />
         </div>
         <div>
           <Menu style={bottomMenuStyle} theme='dark' mode='inline' items={bottomItems} />
