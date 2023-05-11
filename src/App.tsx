@@ -1,5 +1,5 @@
-import { DatePicker } from 'antd';
+import { ViewBoard } from './views/board/ViewBoard';
 
 export const App = () => {
-  return <DatePicker />;
+  return <ViewBoard />;
 };

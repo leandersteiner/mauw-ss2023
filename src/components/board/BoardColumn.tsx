@@ -1,7 +1,7 @@
 import { BoardColumnTask } from './BoardColumnTask';
 import './scrollbar.css';
 
-type BoardColumnProps = {
+export type BoardColumnProps = {
   id: string;
   title: string;
 };
