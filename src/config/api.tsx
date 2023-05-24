@@ -1,4 +1,4 @@
-const BASE_API_URL = 'http://localhost/api/v1';
+const BASE_API_URL = 'http://localhost:3000';
 
 export const API = {
   baseUrl: BASE_API_URL,
