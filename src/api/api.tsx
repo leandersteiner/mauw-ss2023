@@ -14,7 +14,7 @@ function postHeaders() {
   };
 }
 
-export async function getRequest<T>(url: string): Promise<T> {
+export async function getRequest<ResponseType>(url: string): Promise<ResponseType> {
   try {
     const response = await axios.get(url, { headers: getHeaders() });
     return response.data;
@@ -27,9 +27,13 @@ export async function getRequest<T>(url: string): Promise<T> {
   }
 }
 
-export async function postRequest<T>(url: string, data: JSON): Promise<T> {
+export async function postRequest<ResponseType, RequestType>(
+  url: string,
+  data: RequestType
+): Promise<ResponseType> {
   try {
-    const response = await axios.post(url, data, { headers: postHeaders() });
+    const bodyData = JSON.stringify(data);
+    const response = await axios.post(url, bodyData, { headers: postHeaders() });
     return response.data;
   } catch (error) {
     if (error instanceof Error) {
