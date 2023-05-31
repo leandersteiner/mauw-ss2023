@@ -8,7 +8,15 @@ import { HomePage } from './components/start/HomePage';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      useErrorBoundary: true
+    }
+  }
+});
 
 export const App: React.FC = () => {
   return (
