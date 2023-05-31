@@ -7,6 +7,7 @@ import { PathContextProvider } from './context/PathContext';
 import { HomePage } from './components/start/HomePage';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
+import { SecurityContextProvider } from './context/SecurityContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,22 +21,24 @@ const queryClient = new QueryClient({
 
 export const App: React.FC = () => {
   return (
-    <PathContextProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path='/' element={<Navigate to='/home' />} />
-            <Route path='/home' element={<Overview />}>
-              <Route path='login' element={<Login />} />
-              <Route path='register' element={<Register />} />
-              <Route index element={<HomePage />} />
-              <Route path='boards' element={<DatePicker />} />
-              <Route path='settings' element={<DatePicker />} />
-              <Route path='create-project' element={<DatePicker />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </PathContextProvider>
+    <SecurityContextProvider>
+      <PathContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Routes>
+              <Route path='/' element={<Navigate to='/home' />} />
+              <Route path='/home' element={<Overview />}>
+                <Route path='login' element={<Login />} />
+                <Route path='register' element={<Register />} />
+                <Route index element={<HomePage />} />
+                <Route path='boards' element={<DatePicker />} />
+                <Route path='settings' element={<DatePicker />} />
+                <Route path='create-project' element={<DatePicker />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </PathContextProvider>
+    </SecurityContextProvider>
   );
 };
