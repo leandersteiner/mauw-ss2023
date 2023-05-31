@@ -3,36 +3,36 @@ import { AxiosRequestConfig } from 'axios';
 import { User } from '../models/user/User';
 import { useSessionStorage } from '../hooks/useStorage';
 
-interface SecurityContextType {
+interface AuthContextType {
   user: User | null;
   token: string | null;
   loggedIn: boolean;
-  login: (user: User, token: string) => void;
-  logout: () => void;
+  onLogin: (user: User, token: string) => void;
+  onLogout: () => void;
   authConfig: AxiosRequestConfig;
 }
 
-const defaultContext: SecurityContextType = {
+const defaultContext: AuthContextType = {
   user: null,
   token: null,
   loggedIn: false,
-  login: () => {},
-  logout: () => {},
+  onLogin: () => {},
+  onLogout: () => {},
   authConfig: {}
 };
 
-const SecurityContext = createContext<SecurityContextType>(defaultContext);
+const AuthContext = createContext<AuthContextType>(defaultContext);
 
-export const useSecurity = () => useContext(SecurityContext);
+export const useAuth = () => useContext(AuthContext);
 
-type SecurityProviderProps = {
+type AuthProviderProps = {
   children: ReactNode;
 };
 
-export const SecurityContextProvider = (props: SecurityProviderProps) => {
+export const AuthContextProvider = (props: AuthProviderProps) => {
   const [user, setUser, removeUser] = useSessionStorage<User | null>('user', null);
   const [token, setToken, removeToken] = useSessionStorage<string | null>('token', null);
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useSessionStorage<boolean>('loggedIn', false);
   const [authConfig, setAuthConfig] = useState<AxiosRequestConfig>({});
 
   useEffect(() => {
@@ -50,12 +50,12 @@ export const SecurityContextProvider = (props: SecurityProviderProps) => {
       user,
       token,
       loggedIn,
-      login: (newUser: User, newToken: string) => {
+      onLogin: (newUser: User, newToken: string) => {
         setUser(newUser);
         setToken(newToken);
         setLoggedIn(true);
       },
-      logout: () => {
+      onLogout: () => {
         removeToken();
         removeUser();
         setLoggedIn(false);
@@ -65,5 +65,5 @@ export const SecurityContextProvider = (props: SecurityProviderProps) => {
     [user, token, loggedIn, authConfig, removeToken, removeUser, setToken, setUser]
   );
 
-  return <SecurityContext.Provider value={values}>{props.children}</SecurityContext.Provider>;
+  return <AuthContext.Provider value={values}>{props.children}</AuthContext.Provider>;
 };

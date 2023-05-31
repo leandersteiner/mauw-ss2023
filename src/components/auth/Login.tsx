@@ -2,7 +2,9 @@ import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { AuthResponse, loginUser } from '../../api/authApi';
+import { useAuth } from '../../context/AuthContext';
 
 type LoginFormData = {
   username: string;
@@ -10,6 +12,8 @@ type LoginFormData = {
 };
 
 export const Login = () => {
+  const { onLogin } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const createLoginMutation = useMutation(loginUser);
@@ -24,6 +28,8 @@ export const Login = () => {
       onSuccess: (response: AuthResponse) => {
         console.log(response.token);
         queryClient.invalidateQueries('login');
+        onLogin(response.user, response.token);
+        navigate('/home');
         // Todo: set current user show success notification
       }
     });
