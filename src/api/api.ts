@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 
 const axiosConfig: AxiosRequestConfig = {
   baseURL: 'http://localhost:8081',
@@ -9,6 +9,18 @@ const axiosConfig: AxiosRequestConfig = {
 };
 
 const axiosInstance = axios.create(axiosConfig);
+
+const onRequest = (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+  const token = sessionStorage.getItem('token');
+  if (token) {
+    const newConfig = { ...config };
+    newConfig.headers.Authorization = `Bearer ${token}`;
+    return newConfig;
+  }
+  return config;
+};
+
+axiosInstance.interceptors.request.use(onRequest);
 
 const buildApi = (instance: AxiosInstance) => {
   return {
