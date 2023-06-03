@@ -2,12 +2,13 @@ import React from 'react';
 import { DatePicker } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Overview } from './components/appLayout/Overview';
+import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
 import { HomePage } from './components/start/HomePage';
-import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
-import { useAuth } from './context/AuthContext';
+import { Login } from './components/auth/Login';
+import { Logout } from './components/auth/Logout';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,18 +21,26 @@ const queryClient = new QueryClient({
 });
 
 export const App: React.FC = () => {
-  const { loggedIn } = useAuth();
-  console.log(loggedIn);
   return (
     <PathContextProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
-            <Route path='/' element={<Navigate to='/home' />} />
-            <Route path='/home' element={<Overview />}>
+            <Route path='/' element={<Navigate to='home' />} />
+            <Route path='/auth' element={<Overview />}>
               <Route path='login' element={<Login />} />
               <Route path='register' element={<Register />} />
-              <Route index element={<HomePage />} />
+              <Route path='logout' element={<Logout />} />
+            </Route>
+            <Route path='/home' element={<Overview />}>
+              <Route
+                index
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path='boards' element={<DatePicker />} />
               <Route path='settings' element={<DatePicker />} />
               <Route path='create-project' element={<DatePicker />} />
