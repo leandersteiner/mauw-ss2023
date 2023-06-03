@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthResponse, registerUser } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
+import { usePathContext } from '../../context/PathContext';
 
 type RegisterFormData = {
   username: string;
@@ -17,6 +18,9 @@ export const Register = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createRegisterMutation = useMutation(registerUser);
+  const { setPath } = usePathContext();
+
+  useEffect(() => setPath('register'), [setPath]);
 
   if (token) return <Navigate to='/home' replace />;
 

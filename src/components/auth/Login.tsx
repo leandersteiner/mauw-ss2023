@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthResponse, loginUser } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
+import { usePathContext } from '../../context/PathContext';
 
 type LoginFormData = {
   username: string;
@@ -16,6 +17,9 @@ export const Login = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createLoginMutation = useMutation(loginUser);
+  const { setPath } = usePathContext();
+
+  useEffect(() => setPath('login'), [setPath]);
 
   if (token) return <Navigate to='/home' replace />;
 
