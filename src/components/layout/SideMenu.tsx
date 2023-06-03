@@ -1,7 +1,7 @@
 import { Menu } from 'antd';
 import React, { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { UserOutlined } from '@ant-design/icons';
+import { HomeOutlined, LoginOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import { usePathContext } from '../../context/PathContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -34,7 +34,7 @@ export const SideMenu: React.FC = () => {
   const topMenuItems = (
     <Menu.Item key='home'>
       <Link to='/home'>
-        <UserOutlined />
+        <HomeOutlined />
         <span>Home</span>
       </Link>
     </Menu.Item>
@@ -43,13 +43,13 @@ export const SideMenu: React.FC = () => {
     <>
       <Menu.Item key='login'>
         <Link to='login'>
-          <UserOutlined />
+          <LoginOutlined />
           <span>Login</span>
         </Link>
       </Menu.Item>
       <Menu.Item key='register'>
         <Link to='register'>
-          <UserOutlined />
+          <UserAddOutlined />
           <span>Register</span>
         </Link>
       </Menu.Item>

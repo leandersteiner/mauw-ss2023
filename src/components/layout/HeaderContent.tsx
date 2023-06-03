@@ -1,7 +1,8 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { CSSProperties, useContext } from 'react';
+import React from 'react';
 import { usePathContext } from '../../context/PathContext';
+import { useAuth } from '../../context/AuthContext';
 
 type HeaderContentProps = {
   isMenuFolded: boolean;
@@ -9,22 +10,24 @@ type HeaderContentProps = {
 };
 
 export const HeaderContent: React.FC<HeaderContentProps> = (props: HeaderContentProps) => {
-  const buttonWrapperStyle: CSSProperties = {
-    paddingLeft: 10,
-    paddingRight: 10
-  };
-
   const { path } = usePathContext();
+  const { user } = useAuth();
 
   return (
-    <>
-      <span style={buttonWrapperStyle}>
-        <Button
-          icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
-        />
-      </span>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0 8px'
+      }}
+    >
+      <Button
+        icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+        onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
+      />
       <span>{path}</span>
-    </>
+      <span>{user?.username}</span>
+    </div>
   );
 };
