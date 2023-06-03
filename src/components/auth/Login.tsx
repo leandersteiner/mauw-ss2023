@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthResponse, loginUser } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,11 +12,12 @@ type LoginFormData = {
 };
 
 export const Login = () => {
-  const { onLogin } = useAuth();
+  const { onLogin, token } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
   const createLoginMutation = useMutation(loginUser);
+
+  if (token) return <Navigate to='/home' replace />;
 
   const onFinish = async (data: LoginFormData) => {
     const { username, password } = data;
@@ -26,7 +27,6 @@ export const Login = () => {
     }
     await createLoginMutation.mutate(data, {
       onSuccess: (response: AuthResponse) => {
-        console.log(response.token);
         queryClient.invalidateQueries('login');
         onLogin(response.user, response.token);
         navigate('/home');
