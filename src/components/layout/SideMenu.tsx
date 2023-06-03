@@ -3,6 +3,7 @@ import React, { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { UserOutlined } from '@ant-design/icons';
 import { usePathContext } from '../../context/PathContext';
+import { useAuth } from '../../context/AuthContext';
 
 const menuWrapperStyle: CSSProperties = {
   display: 'flex',
@@ -28,32 +29,49 @@ const bottomMenuStyle: CSSProperties = {
 
 export const SideMenu: React.FC = () => {
   const { path } = usePathContext();
+  const { token } = useAuth();
+
+  const topMenuItems = (
+    <Menu.Item key='home'>
+      <Link to='/home'>
+        <UserOutlined />
+        <span>Home</span>
+      </Link>
+    </Menu.Item>
+  );
+  const bottomMenuItems = (
+    <>
+      <Menu.Item key='login'>
+        <Link to='login'>
+          <UserOutlined />
+          <span>Login</span>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key='register'>
+        <Link to='register'>
+          <UserOutlined />
+          <span>Register</span>
+        </Link>
+      </Menu.Item>
+    </>
+  );
+
+  const bottomMenuItemsLoggedIn = (
+    <Menu.Item key='logout'>
+      <Link to='/auth/logout'>
+        <UserOutlined />
+        <span>Logout</span>
+      </Link>
+    </Menu.Item>
+  );
 
   return (
     <div style={menuWrapperStyle}>
       <div style={logoStyle} />
       <Menu theme='dark' mode='vertical' style={menuStyle} selectedKeys={[path]}>
-        <Menu.ItemGroup>
-          <Menu.Item key='home'>
-            <Link to='/home'>
-              <UserOutlined />
-              <span>Home</span>
-            </Link>
-          </Menu.Item>
-        </Menu.ItemGroup>
+        <Menu.ItemGroup>{topMenuItems}</Menu.ItemGroup>;
         <Menu.ItemGroup style={bottomMenuStyle}>
-          <Menu.Item key='login'>
-            <Link to='login'>
-              <UserOutlined />
-              <span>Login</span>
-            </Link>
-          </Menu.Item>
-          <Menu.Item key='register'>
-            <Link to='register'>
-              <UserOutlined />
-              <span>Register</span>
-            </Link>
-          </Menu.Item>
+          {token ? bottomMenuItemsLoggedIn : bottomMenuItems}
         </Menu.ItemGroup>
       </Menu>
     </div>
