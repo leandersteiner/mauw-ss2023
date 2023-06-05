@@ -9,6 +9,7 @@ import { Register } from './components/auth/Register';
 import { Login } from './components/auth/Login';
 import { Logout } from './components/auth/Logout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { Profile } from './components/user/Profile';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +32,9 @@ export const App: React.FC = () => {
               <Route path='login' element={<Login />} />
               <Route path='register' element={<Register />} />
               <Route path='logout' element={<Logout />} />
+            </Route>
+            <Route path='/user' element={<Overview />}>
+              <Route path='' element={<Profile />} />
             </Route>
             <Route path='/home' element={<Overview />}>
               <Route
