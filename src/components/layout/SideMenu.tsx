@@ -69,7 +69,7 @@ export const SideMenu: React.FC = () => {
     <div style={menuWrapperStyle}>
       <div style={logoStyle} />
       <Menu theme='dark' mode='vertical' style={menuStyle} selectedKeys={[path]}>
-        <Menu.ItemGroup>{topMenuItems}</Menu.ItemGroup>;
+        <Menu.ItemGroup>{topMenuItems}</Menu.ItemGroup>
         <Menu.ItemGroup style={bottomMenuStyle}>
           {token ? bottomMenuItemsLoggedIn : bottomMenuItems}
         </Menu.ItemGroup>
