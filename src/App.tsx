@@ -1,7 +1,7 @@
 import React from 'react';
 import { DatePicker } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
 import { HomePage } from './components/start/HomePage';
@@ -14,7 +14,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
       useErrorBoundary: true
     }
   }
