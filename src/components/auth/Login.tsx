@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, notification } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -15,7 +15,6 @@ type LoginFormData = {
 export const Login = () => {
   const { onLogin, token } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const createLoginMutation = useMutation(loginUser);
   const { setPath } = usePathContext();
   const [api, contextHolder] = notification.useNotification();
@@ -25,9 +24,8 @@ export const Login = () => {
   if (token) return <Navigate to='/home' replace />;
 
   const onFinish = async (data: LoginFormData) => {
-    await createLoginMutation.mutate(data, {
+    createLoginMutation.mutate(data, {
       onSuccess: (response: AuthResponse) => {
-        queryClient.invalidateQueries('login');
         onLogin(response.user, response.token);
         Promise.resolve().then(() => {
           api.success({

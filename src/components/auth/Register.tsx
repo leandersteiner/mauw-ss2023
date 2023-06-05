@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -16,7 +16,6 @@ type RegisterFormData = {
 export const Register = () => {
   const { onLogin, token } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const createRegisterMutation = useMutation(registerUser);
   const { setPath } = usePathContext();
 
@@ -32,7 +31,6 @@ export const Register = () => {
     }
     await createRegisterMutation.mutate(data, {
       onSuccess: (response: AuthResponse) => {
-        queryClient.invalidateQueries('register');
         onLogin(response.user, response.token);
         navigate('/home');
         // Todo: set current user show success notification
