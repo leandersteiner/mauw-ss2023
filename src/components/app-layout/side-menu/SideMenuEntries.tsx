@@ -4,25 +4,25 @@ import { SideMenuEntry } from './SideMenuUtils';
 const home: SideMenuEntry = {
   label: 'Home',
   icon: <HomeOutlined />,
-  url: '/home/123/boards'
+  url: '/home'
 };
 
 const projects: SideMenuEntry = {
   label: 'Projects',
   icon: <ProjectOutlined />,
-  url: '/home/123'
+  url: ''
 };
 
 const settings: SideMenuEntry = {
   label: 'Settings',
   icon: <SettingOutlined />,
-  url: '/home/123'
+  url: '/home/settings'
 };
 
 const createProject: SideMenuEntry = {
   label: 'Create Project',
   icon: <PlusOutlined />,
-  url: '/home/123/create-project'
+  url: '/home/create-project'
 };
 
 export function createTopSideMenuEntries(): SideMenuEntry[] {
