@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { UpdateUserForm } from './UpdateUserForm';
-import { DeleteAccountButton } from './DeleteAccountButton';
+import { UpdateUserForm } from '../../components/user/UpdateUserForm';
+import { DeleteAccountButton } from '../../components/user/DeleteAccountButton';
 
 export const Profile = () => {
   const { user, token, onLogin } = useAuth();
