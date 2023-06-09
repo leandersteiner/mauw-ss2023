@@ -12,7 +12,7 @@ type LoginFormData = {
   password: string;
 };
 
-export const Login = () => {
+export const LoginForm = () => {
   const { onLogin, token } = useAuth();
   const navigate = useNavigate();
   const createLoginMutation = useMutation(loginUser);
@@ -29,7 +29,7 @@ export const Login = () => {
         onLogin(response.user, response.token);
         Promise.resolve().then(() => {
           api.success({
-            message: 'Login successful',
+            message: 'LoginForm successful',
             description: 'Please check your username and password'
           });
         });
@@ -37,7 +37,7 @@ export const Login = () => {
       },
       onError: () => {
         api.error({
-          message: 'Login failed',
+          message: 'LoginForm failed',
           description: 'Please check your username and password'
         });
       }
@@ -74,7 +74,7 @@ export const Login = () => {
           <Button type='primary' htmlType='submit' className='login-form-button'>
             Log in
           </Button>
-          Or <Link to='/register'>register now!</Link>
+          Or <Link to='/auth/register'>register now!</Link>
         </Form.Item>
       </Form>
     </>
