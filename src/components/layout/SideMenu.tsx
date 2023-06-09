@@ -57,12 +57,20 @@ export const SideMenu: React.FC = () => {
   );
 
   const bottomMenuItemsLoggedIn = (
-    <Menu.Item key='logout'>
-      <Link to='/auth/logout'>
-        <UserOutlined />
-        <span>Logout</span>
-      </Link>
-    </Menu.Item>
+    <>
+      <Menu.Item key='profile'>
+        <Link to='/user'>
+          <UserOutlined />
+          <span>Profile</span>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key='logout'>
+        <Link to='/auth/logout'>
+          <UserOutlined />
+          <span>Logout</span>
+        </Link>
+      </Menu.Item>
+    </>
   );
 
   return (
