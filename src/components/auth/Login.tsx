@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, notification } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { AuthResponse, loginUser } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
@@ -74,7 +74,7 @@ export const Login = () => {
           <Button type='primary' htmlType='submit' className='login-form-button'>
             Log in
           </Button>
-          Or <a href='register'>register now!</a>
+          Or <Link to='/register'>register now!</Link>
         </Form.Item>
       </Form>
     </>
