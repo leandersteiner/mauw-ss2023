@@ -14,7 +14,7 @@ const onRequest = (config: InternalAxiosRequestConfig): InternalAxiosRequestConf
   const token = sessionStorage.getItem('token');
   if (token) {
     const newConfig = { ...config };
-    newConfig.headers.Authorization = `Bearer ${token}`;
+    newConfig.headers.Authorization = `Bearer ${token.replaceAll('"', '')}`;
     return newConfig;
   }
   return config;

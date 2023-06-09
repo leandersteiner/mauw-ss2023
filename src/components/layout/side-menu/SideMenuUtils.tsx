@@ -1,4 +1,5 @@
 import { MenuProps } from 'antd';
+// import MenuItem from 'antd/es/menu/MenuItem';
 import { ReactNode, Key } from 'react';
 import { NavigateFunction } from 'react-router';
 
@@ -7,6 +8,7 @@ export type MenuItem = Required<MenuProps>['items'][number];
 export type SideMenuEntry = {
   label: string;
   icon: ReactNode;
+  key: Key;
   url: string;
   childEntries?: SideMenuEntry[];
   disabled?: boolean;
@@ -14,22 +16,22 @@ export type SideMenuEntry = {
 
 function createMenuItem(
   label: ReactNode,
+  icon: ReactNode,
   key: Key,
   url: string,
   navigate: NavigateFunction,
-  icon?: ReactNode,
   children?: MenuItem[],
   disabled?: boolean
 ): MenuItem {
   const onClick = () => navigate(url ?? '/');
 
   return {
-    key,
-    icon,
-    children,
     label,
-    disabled,
-    onClick
+    icon,
+    key,
+    onClick,
+    children,
+    disabled
   } as MenuItem;
 }
 
@@ -37,25 +39,14 @@ export function toMenuItemArray(
   menuEntries: SideMenuEntry[],
   navigate: NavigateFunction
 ): MenuItem[] {
-  return menuEntries.map((menuEntry, index) => {
-    if (menuEntry.childEntries != null) {
-      return createMenuItem(
-        menuEntry.label,
-        index,
-        menuEntry.url,
-        navigate,
-        menuEntry.icon,
-        toMenuItemArray(menuEntry.childEntries, navigate),
-        menuEntry.disabled
-      );
-    }
+  return menuEntries.map(menuEntry => {
     return createMenuItem(
       menuEntry.label,
-      index,
+      menuEntry.icon,
+      menuEntry.key,
       menuEntry.url,
       navigate,
-      menuEntry.icon,
-      undefined,
+      menuEntry.childEntries ? toMenuItemArray(menuEntry.childEntries, navigate) : undefined,
       menuEntry.disabled
     );
   });

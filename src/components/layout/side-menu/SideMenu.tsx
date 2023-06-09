@@ -2,13 +2,27 @@ import { Menu } from 'antd';
 import { CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import { MenuItem, toMenuItemArray } from './SideMenuUtils';
-import { createBottomSideMenuEntries, createTopSideMenuEntries } from './SideMenuEntries';
+import { useAuth } from '../../../context/AuthContext';
+import {
+  loggedInBottomSideMenuEntries,
+  loggedInTopSideMenuEntries,
+  loggedOutBottomSideMenuEntries,
+  loggedOutTopSideMenuEntries
+} from './SideMenuEntries';
 
 export const SideMenu: React.FC = () => {
   const navigator = useNavigate();
+  const { token } = useAuth();
 
-  const topItems: MenuItem[] = toMenuItemArray(createTopSideMenuEntries(), navigator);
-  const bottomItems: MenuItem[] = toMenuItemArray(createBottomSideMenuEntries(), navigator);
+  const topItems: MenuItem[] = toMenuItemArray(
+    token ? loggedInTopSideMenuEntries : loggedOutTopSideMenuEntries,
+    navigator
+  );
+
+  const bottomItems: MenuItem[] = toMenuItemArray(
+    token ? loggedInBottomSideMenuEntries : loggedOutBottomSideMenuEntries,
+    navigator
+  );
 
   const menuWrapperStyle: CSSProperties = {
     overflow: 'auto',

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router';
-import { HeaderContent } from './header/HeaderContent';
+import { HeaderContent } from './HeaderContent';
 import { OverviewLayout } from './OverviewLayout';
 import { SideMenu } from './side-menu/SideMenu';
 
