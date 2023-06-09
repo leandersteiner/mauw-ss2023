@@ -5,11 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
 import { HomePage } from './components/start/HomePage';
-import { Register } from './components/auth/Register';
-import { Login } from './components/auth/Login';
+import { RegistrationForm } from './components/auth/RegistrationForm';
+import { LoginForm } from './components/auth/LoginForm';
 import { Logout } from './components/auth/Logout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { Profile } from './components/user/Profile';
+import { Profile } from './views/user/Profile';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,8 +29,8 @@ export const App: React.FC = () => {
           <Routes>
             <Route path='/' element={<Navigate to='home' />} />
             <Route path='/auth' element={<Overview />}>
-              <Route path='login' element={<Login />} />
-              <Route path='register' element={<Register />} />
+              <Route path='login' element={<LoginForm />} />
+              <Route path='register' element={<RegistrationForm />} />
               <Route path='logout' element={<Logout />} />
             </Route>
             <Route path='/user' element={<Overview />}>
