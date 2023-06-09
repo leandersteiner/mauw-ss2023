@@ -1,8 +1,8 @@
 import {
+  createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
-  createContext,
   useContext,
   useMemo,
   useState
@@ -13,14 +13,14 @@ interface PathContextType {
   setPath: Dispatch<SetStateAction<string>>;
 }
 
-const defaultContext: PathContextType = { path: '', setPath: () => { } };
+const defaultContext: PathContextType = { path: '', setPath: () => {} };
 
 const context = createContext<PathContextType>(defaultContext);
 
 export const usePathContext = () => useContext(context);
 
 export const PathContextProvider = (props: { children: ReactNode }) => {
-  const [path, setPath] = useState('home');
+  const [path, setPath] = useState('');
 
   const pathContextProviderValue = useMemo(() => ({ path, setPath }), [path, setPath]);
 

@@ -1,5 +1,5 @@
 import { Layout, theme } from 'antd';
-import { ReactNode, CSSProperties } from 'react';
+import React, { CSSProperties, ReactNode } from 'react';
 
 const { Header, Sider, Content } = Layout;
 

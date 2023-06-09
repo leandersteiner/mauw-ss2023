@@ -1,33 +1,36 @@
-import React from 'react';
-import { useMutation, useQueryClient } from 'react-query';
+import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { AuthResponse, loginUser } from '../../api/authApi';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { AuthResponse, registerUser } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
+import { usePathContext } from '../../context/PathContext';
 
-type LoginFormData = {
+type RegistrationFormData = {
   username: string;
+  email: string;
   password: string;
 };
 
-export const Login = () => {
-  const { onLogin } = useAuth();
+export const RegistrationForm = () => {
+  const { onLogin, token } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const createRegisterMutation = useMutation(registerUser);
+  const { setPath } = usePathContext();
 
-  const createLoginMutation = useMutation(loginUser);
+  useEffect(() => setPath('register'), [setPath]);
 
-  const onFinish = async (data: LoginFormData) => {
-    const { username, password } = data;
-    if (!username || !password) {
+  if (token) return <Navigate to='/home' replace />;
+
+  const onFinish = async (data: RegistrationFormData) => {
+    const { username, email, password } = data;
+    if (!username || !email || !password) {
       // Todo: error handling
-      alert('Please provide username and password');
+      alert('Please provide username, email and password');
     }
-    await createLoginMutation.mutate(data, {
+    await createRegisterMutation.mutate(data, {
       onSuccess: (response: AuthResponse) => {
-        console.log(response.token);
-        queryClient.invalidateQueries('login');
         onLogin(response.user, response.token);
         navigate('/home');
         // Todo: set current user show success notification
@@ -37,7 +40,7 @@ export const Login = () => {
 
   return (
     <Form
-      name='normal_login'
+      name='normal_register'
       className='login-form'
       initialValues={{ remember: true }}
       onFinish={onFinish}
@@ -47,6 +50,16 @@ export const Login = () => {
         rules={[{ required: true, message: 'Please input your Username!' }]}
       >
         <Input prefix={<UserOutlined className='site-form-item-icon' />} placeholder='Username' />
+      </Form.Item>
+      <Form.Item
+        name='email'
+        rules={[{ type: 'email', required: true, message: 'Please input your Email!' }]}
+      >
+        <Input
+          prefix={<UserOutlined className='site-form-item-icon' />}
+          type='email'
+          placeholder='Email'
+        />
       </Form.Item>
       <Form.Item
         name='password'
@@ -61,9 +74,9 @@ export const Login = () => {
 
       <Form.Item>
         <Button type='primary' htmlType='submit' className='login-form-button'>
-          Log in
+          Register
         </Button>
-        Or <a href='register'>register now!</a>
+        Or <Link to='/auth/login'>Log in now!</Link>
       </Form.Item>
     </Form>
   );

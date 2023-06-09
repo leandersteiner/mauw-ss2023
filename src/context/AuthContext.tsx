@@ -6,7 +6,6 @@ import { useSessionStorage } from '../hooks/useStorage';
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  loggedIn: boolean;
   onLogin: (user: User, token: string) => void;
   onLogout: () => void;
   authConfig: AxiosRequestConfig;
@@ -15,7 +14,6 @@ interface AuthContextType {
 const defaultContext: AuthContextType = {
   user: null,
   token: null,
-  loggedIn: false,
   onLogin: () => {},
   onLogout: () => {},
   authConfig: {}
@@ -32,7 +30,6 @@ type AuthProviderProps = {
 export const AuthContextProvider = (props: AuthProviderProps) => {
   const [user, setUser, removeUser] = useSessionStorage<User | null>('user', null);
   const [token, setToken, removeToken] = useSessionStorage<string | null>('token', null);
-  const [loggedIn, setLoggedIn] = useSessionStorage<boolean>('loggedIn', false);
   const [authConfig, setAuthConfig] = useState<AxiosRequestConfig>({});
 
   useEffect(() => {
@@ -49,20 +46,17 @@ export const AuthContextProvider = (props: AuthProviderProps) => {
     () => ({
       user,
       token,
-      loggedIn,
       onLogin: (newUser: User, newToken: string) => {
         setUser(newUser);
         setToken(newToken);
-        setLoggedIn(true);
       },
       onLogout: () => {
         removeToken();
         removeUser();
-        setLoggedIn(false);
       },
       authConfig
     }),
-    [user, token, loggedIn, authConfig, removeToken, removeUser, setToken, setUser]
+    [user, token, authConfig, setUser, setToken, removeToken, removeUser]
   );
 
   return <AuthContext.Provider value={values}>{props.children}</AuthContext.Provider>;

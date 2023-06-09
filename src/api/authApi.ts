@@ -9,5 +9,5 @@ export type AuthResponse = {
 export const loginUser = (user: { username: string; password: string }) =>
   api.post<AuthResponse>('login', user).then(res => res.data);
 
-export const registerUser = (user: Omit<User, 'id'>) =>
-  api.post('register', user).then(res => res.data);
+export const registerUser = (user: { username: string; email: string; password: string }) =>
+  api.post<AuthResponse>('register', user).then(res => res.data);
