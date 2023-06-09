@@ -2,18 +2,18 @@ import { useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { AuthResponse, registerUser } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
 
-type RegisterFormData = {
+type RegistrationFormData = {
   username: string;
   email: string;
   password: string;
 };
 
-export const Register = () => {
+export const RegistrationForm = () => {
   const { onLogin, token } = useAuth();
   const navigate = useNavigate();
   const createRegisterMutation = useMutation(registerUser);
@@ -23,7 +23,7 @@ export const Register = () => {
 
   if (token) return <Navigate to='/home' replace />;
 
-  const onFinish = async (data: RegisterFormData) => {
+  const onFinish = async (data: RegistrationFormData) => {
     const { username, email, password } = data;
     if (!username || !email || !password) {
       // Todo: error handling
@@ -76,7 +76,7 @@ export const Register = () => {
         <Button type='primary' htmlType='submit' className='login-form-button'>
           Register
         </Button>
-        Or <a href='login'>Login now!</a>
+        Or <Link to='/auth/login'>Log in now!</Link>
       </Form.Item>
     </Form>
   );
