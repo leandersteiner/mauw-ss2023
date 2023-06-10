@@ -4,6 +4,7 @@ import './scrollbar.css';
 export type BoardColumnProps = {
   id: string;
   title: string;
+  tasks: [{ id: string; title: string }];
 };
 
 const tasks = [
@@ -26,7 +27,7 @@ export const BoardColumn = (props: BoardColumnProps) => {
     <div style={{ padding: '8px' }}>
       <h1>{props.title}</h1>
       <div style={{ height: '350px', overflowY: 'auto' }} className='scrollbar'>
-        {tasks.map(task => (
+        {props.tasks.map(task => (
           <div key={task.id} style={{ paddingBottom: '8px', paddingTop: '8px' }} draggable>
             <BoardColumnTask id={task.id} title={task.title} />
           </div>
