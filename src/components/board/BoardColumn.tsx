@@ -1,10 +1,11 @@
 import { BoardColumnTask } from './BoardColumnTask';
 import './scrollbar.css';
+import { Task } from '../../models/task/Task';
 
 export type BoardColumnProps = {
   id: string;
   title: string;
-  tasks: [{ id: string; title: string }];
+  tasks: Task[];
 };
 
 const tasks = [
@@ -29,7 +30,7 @@ export const BoardColumn = (props: BoardColumnProps) => {
       <div style={{ height: '350px', overflowY: 'auto' }} className='scrollbar'>
         {props.tasks.map(task => (
           <div key={task.id} style={{ paddingBottom: '8px', paddingTop: '8px' }} draggable>
-            <BoardColumnTask id={task.id} title={task.title} />
+            <BoardColumnTask id={task.id} title={task.name} />
           </div>
         ))}
       </div>

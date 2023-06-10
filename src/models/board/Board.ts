@@ -1,3 +1,5 @@
+import { Task } from '../task/Task';
+
 export interface Board {
   id: string;
   title: string;
@@ -9,7 +11,7 @@ export interface Board {
         id: string;
         name: string;
       };
-      tasks: [{ id: string }];
+      tasks: Task[];
     }
   ];
 }
