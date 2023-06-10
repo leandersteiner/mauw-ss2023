@@ -32,12 +32,20 @@ export const SideMenu: React.FC = () => {
   const { token } = useAuth();
 
   const topMenuItems = (
-    <Menu.Item key='home'>
-      <Link to='/home'>
-        <HomeOutlined />
-        <span>Home</span>
-      </Link>
-    </Menu.Item>
+    <>
+      <Menu.Item key='home'>
+        <Link to='/home'>
+          <HomeOutlined />
+          <span>Home</span>
+        </Link>
+      </Menu.Item>
+      <Menu.Item key='board'>
+        <Link to='/board'>
+          <HomeOutlined />
+          <span>Board</span>
+        </Link>
+      </Menu.Item>
+    </>
   );
   const bottomMenuItems = (
     <>
