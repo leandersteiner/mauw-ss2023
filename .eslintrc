@@ -23,6 +23,7 @@
     "project": ["./tsconfig.json"]
   },
   "plugins": ["react", "@typescript-eslint", "prettier"],
+  "ignorePatterns": ["vite.config.ts"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
     "react-hooks/rules-of-hooks": "error",
@@ -34,9 +35,10 @@
       2,
       { "namedComponents": "arrow-function", "unnamedComponents": "arrow-function" }
     ],
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": false}],
     "react/require-default-props": "off",
     "react/destructuring-assignment": "off",
-    "consistent-return": "warn"
+    "consistent-return": "warn",
+    "jsx-a11y/label-has-associated-control": "off"
   }
 }
