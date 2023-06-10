@@ -27,6 +27,8 @@ export const Board = (props: BoardProps) => {
     return <div>There was an unexpected error: {error.message}</div>;
   }
 
+  console.log(data.columns);
+
   return (
     <Row>
       {data.columns.map(column => (
