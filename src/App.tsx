@@ -10,6 +10,7 @@ import { LoginForm } from './components/auth/LoginForm';
 import { Logout } from './components/auth/Logout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Profile } from './views/user/Profile';
+import { BoardView } from './views/board/BoardView';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,9 +46,11 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path='boards' element={<DatePicker />} />
               <Route path='settings' element={<DatePicker />} />
               <Route path='create-project' element={<DatePicker />} />
+            </Route>
+            <Route path='/board' element={<Overview />}>
+              <Route path='' element={<BoardView />} />
             </Route>
           </Routes>
         </BrowserRouter>
