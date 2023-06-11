@@ -4,6 +4,7 @@ export interface Task {
   description: string;
   done: boolean;
   priority: number;
+  position: number;
   assigneeId: string;
   stateId: string;
   sprintId: string;

@@ -39,6 +39,8 @@
     "react/require-default-props": "off",
     "react/destructuring-assignment": "off",
     "consistent-return": "warn",
-    "jsx-a11y/label-has-associated-control": "off"
+    "jsx-a11y/label-has-associated-control": "off",
+    "react/jsx-props-no-spreading": "off",
+    "no-param-reassign": "off"
   }
 }

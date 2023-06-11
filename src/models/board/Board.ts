@@ -1,17 +1,7 @@
-import { Task } from '../task/Task';
+import { BoardColumn } from './BoardColumn';
 
 export interface Board {
   id: string;
   title: string;
-  columns: [
-    {
-      id: string;
-      title: string;
-      state: {
-        id: string;
-        name: string;
-      };
-      tasks: Task[];
-    }
-  ];
+  columns: BoardColumn[];
 }

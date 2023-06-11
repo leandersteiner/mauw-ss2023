@@ -6,5 +6,9 @@ type BoardColumnTaskProps = {
 };
 
 export const BoardColumnTask = (props: BoardColumnTaskProps) => {
-  return <Card title={props.title}>Test</Card>;
+  return (
+    <Card title={props.title} style={{ borderRadius: 0, border: '1px solid #cfcfcf' }}>
+      Test
+    </Card>
+  );
 };

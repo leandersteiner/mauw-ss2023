@@ -40,7 +40,7 @@ export const SideMenu: React.FC = () => {
         </Link>
       </Menu.Item>
       <Menu.Item key='board'>
-        <Link to='/board'>
+        <Link to='/orgs/080fbaf6-e3f7-4ffe-ab97-d8d268138d9e/teams/6713a4df-33f6-43f6-beed-eef88bb33791/projects/732e753a-aca8-41d8-9fbc-053e0bcb79cf/board'>
           <HomeOutlined />
           <span>Board</span>
         </Link>
