@@ -1,5 +1,5 @@
 import { Menu } from 'antd';
-import { CSSProperties } from 'react';
+import { CSSProperties, Key } from 'react';
 import { useNavigate } from 'react-router';
 import { MenuItem, toMenuItemArray } from './SideMenuUtils';
 import { useAuth } from '../../../context/AuthContext';
@@ -9,10 +9,12 @@ import {
   loggedOutBottomSideMenuEntries,
   loggedOutTopSideMenuEntries
 } from './SideMenuEntries';
+import { usePathContext } from '../../../context/PathContext';
 
 export const SideMenu: React.FC = () => {
   const navigator = useNavigate();
   const { token } = useAuth();
+  const { path } = usePathContext();
 
   const topItems: MenuItem[] = toMenuItemArray(
     token ? loggedInTopSideMenuEntries : loggedOutTopSideMenuEntries,
@@ -51,10 +53,17 @@ export const SideMenu: React.FC = () => {
       <div style={logo} />
       <div style={menuContatinerStyle}>
         <div>
-          <Menu theme='dark' mode='inline' defaultSelectedKeys={['0']} items={topItems} />
+          <Menu theme='dark' mode='inline' items={topItems} selectedKeys={[path]} />
         </div>
         <div>
-          <Menu style={bottomMenuStyle} theme='dark' mode='inline' items={bottomItems} />
+          <Menu
+            selectable={false}
+            style={bottomMenuStyle}
+            theme='dark'
+            mode='inline'
+            items={bottomItems}
+            selectedKeys={[path]}
+          />
         </div>
       </div>
     </div>

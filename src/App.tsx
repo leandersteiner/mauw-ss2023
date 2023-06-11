@@ -5,7 +5,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
-import { HomePage } from './components/start/HomePage';
+import { HomePage } from './views/home/HomePage';
 import { RegistrationForm } from './components/auth/RegistrationForm';
 import { LoginForm } from './components/auth/LoginForm';
 import { Logout } from './components/auth/Logout';
