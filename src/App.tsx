@@ -1,5 +1,4 @@
 import React from 'react';
-import { DatePicker } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -11,6 +10,9 @@ import { LoginForm } from './components/auth/LoginForm';
 import { Logout } from './components/auth/Logout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Profile } from './views/user/Profile';
+import { Settings } from './views/settings/Settings';
+import { Organisations } from './views/organisations/Organisations';
+import { Projects } from './views/projects/Projects';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,9 +48,9 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path='projects' element={<DatePicker />} />
-              <Route path='settings' element={<DatePicker />} />
-              <Route path='orgs' element={<DatePicker />} />
+              <Route path='projects' element={<Projects />} />
+              <Route path='settings' element={<Settings />} />
+              <Route path='orgs' element={<Organisations />} />
             </Route>
           </Routes>
         </BrowserRouter>
