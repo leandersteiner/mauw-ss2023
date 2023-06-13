@@ -1,4 +1,5 @@
 import { Board } from '../board/Board';
+// eslint-disable-next-line import/no-cycle
 import { Team } from '../team/Team';
 import { User } from '../user/User';
 
