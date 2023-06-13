@@ -17,18 +17,18 @@ const home: SideMenuEntry = {
   url: '/home'
 };
 
-const projects: SideMenuEntry = {
-  label: 'Projects',
-  key: 'projects',
-  icon: <ProjectOutlined />,
-  url: '/home/projects'
-};
-
 const organisations: SideMenuEntry = {
   label: 'Organisations',
   key: 'organisations',
   icon: <UngroupOutlined />,
   url: '/home/orgs'
+};
+
+const projectsEntry: SideMenuEntry = {
+  label: 'Projects',
+  key: 'projects',
+  icon: <ProjectOutlined />,
+  url: '/home/projects'
 };
 
 const settings: SideMenuEntry = {
@@ -66,7 +66,11 @@ const register: SideMenuEntry = {
   url: '/auth/register'
 };
 
-export const loggedInTopSideMenuEntries: SideMenuEntry[] = Array.of(home, organisations, projects);
+export const loggedInTopSideMenuEntries: SideMenuEntry[] = Array.of(
+  home,
+  organisations,
+  projectsEntry
+);
 export const loggedInBottomSideMenuEntries: SideMenuEntry[] = Array.of(profile, logout, settings);
 
 export const loggedOutTopSideMenuEntries: SideMenuEntry[] = Array.of(home);

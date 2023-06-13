@@ -1,7 +1,9 @@
 import { Menu } from 'antd';
-import { CSSProperties, Key } from 'react';
+import { CSSProperties, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { MenuItem, toMenuItemArray } from './SideMenuUtils';
+import { useMutation } from '@tanstack/react-query';
+import { ProjectOutlined } from '@ant-design/icons';
+import { SideMenuEntry, toMenuItemArray } from './SideMenuUtils';
 import { useAuth } from '../../../context/AuthContext';
 import {
   loggedInBottomSideMenuEntries,
@@ -10,21 +12,45 @@ import {
   loggedOutTopSideMenuEntries
 } from './SideMenuEntries';
 import { usePathContext } from '../../../context/PathContext';
+import { getProjects } from '../../../api/projectsApi';
+import { Project } from '../../../models/project/Project';
 
 export const SideMenu: React.FC = () => {
   const navigator = useNavigate();
   const { token } = useAuth();
   const { path } = usePathContext();
+  let topEntries = token ? loggedInTopSideMenuEntries : loggedOutTopSideMenuEntries;
+  const bottomEntries = token ? loggedInBottomSideMenuEntries : loggedOutBottomSideMenuEntries;
 
-  const topItems: MenuItem[] = toMenuItemArray(
-    token ? loggedInTopSideMenuEntries : loggedOutTopSideMenuEntries,
-    navigator
-  );
+  const { mutate: getUsersProjects } = useMutation(getProjects, {
+    onSuccess: (response: Project[]) => {
+      const entries = response.map(project => {
+        return {
+          label: project.name,
+          key: project.name,
+          icon: null,
+          url: ''
+        } as SideMenuEntry;
+      });
 
-  const bottomItems: MenuItem[] = toMenuItemArray(
-    token ? loggedInBottomSideMenuEntries : loggedOutBottomSideMenuEntries,
-    navigator
-  );
+      const projectsEntry: SideMenuEntry = {
+        label: 'Projects',
+        key: 'projects',
+        icon: <ProjectOutlined />,
+        url: '/home/projects',
+        childEntries: entries
+      };
+
+      const newEntries = loggedInTopSideMenuEntries;
+      newEntries[newEntries.length - 1] = projectsEntry;
+
+      topEntries = newEntries;
+    }
+  });
+
+  useEffect(() => {
+    getUsersProjects();
+  }, [getUsersProjects]);
 
   const menuWrapperStyle: CSSProperties = {
     overflow: 'auto',
@@ -53,7 +79,12 @@ export const SideMenu: React.FC = () => {
       <div style={logo} />
       <div style={menuContatinerStyle}>
         <div>
-          <Menu theme='dark' mode='inline' items={topItems} selectedKeys={[path]} />
+          <Menu
+            theme='dark'
+            mode='inline'
+            items={toMenuItemArray(topEntries, navigator)}
+            selectedKeys={[path]}
+          />
         </div>
         <div>
           <Menu
@@ -61,7 +92,7 @@ export const SideMenu: React.FC = () => {
             style={bottomMenuStyle}
             theme='dark'
             mode='inline'
-            items={bottomItems}
+            items={toMenuItemArray(bottomEntries, navigator)}
             selectedKeys={[path]}
           />
         </div>
