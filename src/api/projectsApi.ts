@@ -7,10 +7,10 @@ export const getProjecById = (projectId: string) =>
   api.get<Project>(`projects/${projectId}`).then(res => res.data);
 
 export const getOrganisationProjects = (orgId: string) =>
-  api.get<Project[]>(`orgs/${orgId}/projects`).then(res => res.data);
+  api.get<Project[]>(`projects/orgs/${orgId}/projects`).then(res => res.data);
 
 export const getTeamProjects = (orgId: string, teamId: string) =>
-  api.get<Project[]>(`orgs/${orgId}/teams/${teamId}/projects`).then(res => res.data);
+  api.get<Project[]>(`projects/orgs/${orgId}/teams/${teamId}/projects`).then(res => res.data);
 
 export const createProject = (
   orgId: string,
@@ -18,7 +18,7 @@ export const createProject = (
   createProjectRequest: CreateProjectRequest
 ) =>
   api
-    .post<Project>(`orgs/${orgId}/teams/${teamId}/projects`, createProjectRequest)
+    .post<Project>(`projects/orgs/${orgId}/teams/${teamId}/projects`, createProjectRequest)
     .then(res => res.data);
 
 export const addUserToProject = (
@@ -28,8 +28,11 @@ export const addUserToProject = (
   addUserToProjectRequest: AddUserToProjectRequest
 ) =>
   api
-    .post<Project>(`orgs/${orgId}/teams/${teamId}/projects/${projectId}`, addUserToProjectRequest)
+    .post<Project>(
+      `projects/orgs/${orgId}/teams/${teamId}/projects/${projectId}`,
+      addUserToProjectRequest
+    )
     .then(res => res.data);
 
 export const deleteProject = (orgId: string, teamId: string, projectId: string) =>
-  api.delete(`orgs/${orgId}/teams/${teamId}/projects/${projectId}`);
+  api.delete(`projects/orgs/${orgId}/teams/${teamId}/projects/${projectId}`);
