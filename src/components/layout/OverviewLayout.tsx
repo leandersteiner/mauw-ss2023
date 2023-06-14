@@ -21,7 +21,9 @@ export const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLay
 
   const contentStyle: CSSProperties = {
     margin: '24px 16px',
-    padding: 24
+    padding: 24,
+    overflowY: 'auto',
+    height: '100%'
   };
 
   const headerStyle: CSSProperties = {
