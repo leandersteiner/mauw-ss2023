@@ -1,6 +1,10 @@
 import { Button, Input, Modal, Radio } from 'antd';
-import { CSSProperties } from 'react';
-import { useNavigate } from 'react-router';
+import { CSSProperties, Dispatch } from 'react';
+
+type CreateProjectModalProps = {
+  isCreateProjectModalOpen: boolean;
+  setIsCreateProjectModalOpen: Dispatch<React.SetStateAction<boolean>>;
+};
 
 const createProjectModalBodyStyle: CSSProperties = {
   margin: 'auto'
@@ -11,15 +15,15 @@ const createProjectModalItemStyle: CSSProperties = {
   marginBottom: 15
 };
 
-export const CreateProjectModal: React.FC = () => {
-  const navigate = useNavigate();
-
-  const onCancel = () => navigate(-1);
+export const CreateProjectModal: React.FC<CreateProjectModalProps> = (
+  props: CreateProjectModalProps
+) => {
+  const onCancel = () => props.setIsCreateProjectModalOpen(false);
 
   return (
     <Modal
       title='Start a new Project 🎉'
-      open
+      open={props.isCreateProjectModalOpen}
       destroyOnClose
       onOk={undefined}
       onCancel={onCancel}
