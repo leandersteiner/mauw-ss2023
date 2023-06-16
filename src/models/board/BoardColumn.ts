@@ -7,6 +7,7 @@ export interface BoardColumn {
     id: string;
     name: string;
   };
+  taskStateId: string;
   position: number;
   tasks: Task[];
 }

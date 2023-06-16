@@ -26,6 +26,7 @@
   "ignorePatterns": ["vite.config.ts"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-shadow": "off",
     "react-hooks/rules-of-hooks": "error",
     "object-shorthand": "error",
     "no-console": "warn",
@@ -41,6 +42,7 @@
     "consistent-return": "warn",
     "jsx-a11y/label-has-associated-control": "off",
     "react/jsx-props-no-spreading": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "no-shadow": "off"
   }
 }

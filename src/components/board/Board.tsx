@@ -1,56 +1,36 @@
-import { Col, Row, Space, Spin } from 'antd';
+import { Col, Row } from 'antd';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
 import { BoardColumn } from './BoardColumn';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { AddNewItem } from './AddNewItem';
-import { BoardResponse, getBoard } from '../../api/boardApi';
 import { TaskResponse, updateTask } from '../../api/taskApi';
 import { Task } from '../../models/task/Task';
+import { Board as BoardModel } from '../../models/board/Board';
+import { moveInList } from '../../helpers/drag';
+import {
+  BoardColumnResponse,
+  updateBoardColumn,
+  UpdateBoardColumnRequest
+} from '../../api/boardApi';
 
 const parseDndId = (dndId: string) => dndId.split(':')[1];
 
 type BoardProps = {
   projectId: string;
+  board: BoardModel;
 };
 
-export const Board = ({ projectId }: BoardProps) => {
-  const queryClient = useQueryClient();
-  const {
-    isLoading,
-    isError,
-    error,
-    data: board
-  } = useQuery<BoardResponse, Error>({
-    queryKey: ['board'],
-    queryFn: () => getBoard(projectId)
+export const Board = ({ projectId, board: model }: BoardProps) => {
+  const [board, setBoard] = useState<BoardModel>(model);
+  const updateTaskMutation = useMutation<TaskResponse, Error, Task>({
+    mutationFn: updateTask(projectId)
   });
-
-  const mutation = useMutation<TaskResponse, Error, Task>({
-    mutationFn: updateTask(projectId ?? ''),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['board']
-      });
-    }
+  const updateColumnMutation = useMutation<BoardColumnResponse, Error, UpdateBoardColumnRequest>({
+    mutationFn: updateBoardColumn(projectId)
   });
-
-  if (isLoading) {
-    return (
-      <Space direction='vertical' style={{ width: '100%' }}>
-        <Spin tip='Loading' size='large'>
-          <div className='content' />
-        </Spin>
-      </Space>
-    );
-  }
-
-  if (isError) {
-    return <div>There was an unexpected error: {error.message}</div>;
-  }
-
-  console.log(board, projectId);
 
   const handleCardMoved = (cardId: string, columnId: string, index: number) => {
     const newColumn = board.columns.find(column => column.id === columnId);
@@ -59,11 +39,18 @@ export const Board = ({ projectId }: BoardProps) => {
     if (!updatedTask) return;
     updatedTask.boardColumnId = columnId;
     updatedTask.position = index;
-    mutation.mutate(updatedTask);
+    updateTaskMutation.mutate(updatedTask);
+    setBoard(board);
   };
 
   const handleListMoved = (id: string, index: number) => {
-    console.log(id, index);
+    const column = board.columns.find(column => column.id === id);
+    if (!column) return;
+    moveInList(board.columns, column.position, index);
+    setBoard({ ...board });
+    board.columns.forEach(column =>
+      updateColumnMutation.mutate({ columnId: column.id, data: column })
+    );
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -102,32 +89,34 @@ export const Board = ({ projectId }: BoardProps) => {
                 title='Backlog'
               />
             </Col>
-            {board.columns.map(column => (
-              <Draggable
-                key={column.id}
-                draggableId={`column:${column.id}`}
-                index={column.position}
-              >
-                {(provided, snapshot) => (
-                  <Col
-                    key={column.id}
-                    flex='auto'
-                    style={{ height: '100%' }}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                  >
-                    <BoardColumn
-                      onMove={(draggableId, index) => console.log(draggableId, index)}
-                      tasks={column.tasks}
-                      index={column.position}
-                      id={column.id}
-                      title={column.title}
-                    />
-                  </Col>
-                )}
-              </Draggable>
-            ))}
+            {board.columns
+              .sort((a, b) => a.position - b.position)
+              .map(column => (
+                <Draggable
+                  key={column.id}
+                  draggableId={`column:${column.id}`}
+                  index={column.position}
+                >
+                  {(provided, snapshot) => (
+                    <Col
+                      key={column.id}
+                      flex='auto'
+                      style={{ height: '100%' }}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <BoardColumn
+                        onMove={(draggableId, index) => console.log(draggableId, index)}
+                        tasks={column.tasks}
+                        index={column.position}
+                        id={column.id}
+                        title={column.title}
+                      />
+                    </Col>
+                  )}
+                </Draggable>
+              ))}
             {placeholder}
             <Col flex='auto'>
               <AddNewItem
