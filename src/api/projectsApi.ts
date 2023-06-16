@@ -12,13 +12,12 @@ export const getOrganisationProjects = (orgId: string) =>
 export const getTeamProjects = (orgId: string, teamId: string) =>
   api.get<Project[]>(`orgs/${orgId}/teams/${teamId}/projects`).then(res => res.data);
 
-export const createProject = (
-  orgId: string,
-  teamId: string,
-  createProjectRequest: CreateProjectRequest
-) =>
+export const createProject = (createProjectRequest: CreateProjectRequest) =>
   api
-    .post<Project>(`orgs/${orgId}/teams/${teamId}/projects`, createProjectRequest)
+    .post<Project>(
+      `orgs/${createProjectRequest.orgId}/teams/${createProjectRequest.teamId}/projects`,
+      createProjectRequest.body
+    )
     .then(res => res.data);
 
 export const addUserToProject = (
