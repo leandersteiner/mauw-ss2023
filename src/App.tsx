@@ -49,6 +49,7 @@ export const App: React.FC = () => {
                 }
               />
               <Route path='projects' element={<Projects />} />
+              <Route path='projects/:projectId/boards' element={<Settings />} />
               <Route path='settings' element={<Settings />} />
               <Route path='orgs' element={<Organisations />} />
             </Route>
