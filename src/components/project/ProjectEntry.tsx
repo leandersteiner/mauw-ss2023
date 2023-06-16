@@ -1,4 +1,4 @@
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, ReactNode, useState } from 'react';
 import { DeleteOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Tooltip, Typography } from 'antd';
 import Title from 'antd/es/typography/Title';
@@ -6,6 +6,7 @@ import { deleteProject } from '../../api/projectsApi';
 import { Project } from '../../models/project/Project';
 import { useAuth } from '../../context/AuthContext';
 import { DateUtils } from '../../helpers/date';
+import { AddUserModal } from './AddUserModal';
 
 type ProjectEntryProps = {
   project: Project;
@@ -20,8 +21,8 @@ const buttonContainerStyle: CSSProperties = {
 
 export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryProps) => {
   const { user } = useAuth();
-
   const [isHover, setIsHover] = useState(false);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState<boolean>(false);
 
   const projectEntryStyle: CSSProperties = {
     transition: 'box-shadow .3s',
@@ -69,6 +70,14 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
+      <AddUserModal
+        teamId={props.project.team.id}
+        orgId={props.project.team.organisation.id}
+        projectId={props.project.id}
+        isAddUserModalOpen={isAddUserModalOpen}
+        setIsAddUserModalOpen={setIsAddUserModalOpen}
+      />
+
       <span style={projectHeaderStyle}>
         <Typography.Title
           style={{ margin: '0', maxWidth: '50%' }}
@@ -100,6 +109,7 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
             <Button
               icon={<UserAddOutlined />}
               disabled={!(props.project.owner.username === user?.username)}
+              onClick={() => setIsAddUserModalOpen(!isAddUserModalOpen)}
             />
           </Tooltip>
 
