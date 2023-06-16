@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Row } from 'antd';
+import { Button, Col, Row, Skeleton } from 'antd';
 import { usePathContext } from '../../context/PathContext';
 import { Project } from '../../models/project/Project';
 import { getProjects } from '../../api/projectsApi';
@@ -31,6 +31,10 @@ export const Projects = () => {
       setProjects(data);
     }
   }, [data]);
+
+  if (isLoading) {
+    return <Skeleton active />;
+  }
 
   return (
     <span>
