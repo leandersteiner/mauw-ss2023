@@ -1,5 +1,5 @@
 import { CSSProperties, useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Col, Row } from 'antd';
 import { usePathContext } from '../../context/PathContext';
@@ -20,14 +20,17 @@ export const Projects = () => {
   const [projects, setProjects] = useState<Project[]>();
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
 
-  const { mutate: getUsersProjects } = useMutation(getProjects, {
-    onSuccess: (response: Project[]) => {
-      setProjects(response);
-    }
+  const { isLoading, isError, error, data } = useQuery<Project[], Error>({
+    queryKey: ['projects'],
+    queryFn: getProjects
   });
 
   useEffect(() => setPath('projects'), [setPath]);
-  useEffect(() => getUsersProjects(), [getUsersProjects]);
+  useEffect(() => {
+    if (data !== undefined) {
+      setProjects(data);
+    }
+  }, [data]);
 
   return (
     <span>
