@@ -1,3 +1,7 @@
+import { removeItemById } from './array';
+import { Task } from '../models/task/Task';
+import { BoardColumn } from '../models/board/BoardColumn';
+
 type DragItem = {
   id: string;
   position: number;
@@ -11,17 +15,20 @@ export const reorder = <T extends DragItem>(list: T[]): T[] => {
   });
 };
 
-export const moveBetweenLists = <T extends DragItem>(
-  source: T[],
-  destination: T[],
-  item: T,
-  fromPosition: number,
-  toPosition: number
-): { source: T[]; destination: T[] } => {
-  const sourceResult = source.filter(i => i.position !== fromPosition);
-  const destinationResult = Array.from(destination);
-  destinationResult.push({ ...item, position: toPosition });
-  return { source: reorder(sourceResult), destination: reorder(destinationResult) };
+export const moveTaskBetweenColumns = (
+  source: BoardColumn,
+  destination: BoardColumn,
+  item: Task
+): BoardColumn => {
+  if (source.id !== destination.id) {
+    source.tasks = removeItemById(source.tasks, item.id);
+  }
+
+  destination.tasks.push(item);
+
+  reorder(source.tasks);
+  reorder(destination.tasks);
+  return source;
 };
 
 export const moveInList = <T extends DragItem>(
@@ -49,4 +56,5 @@ export const moveInList = <T extends DragItem>(
     return item;
   });
   movedItem.position = toPosition;
+  list = reorder(list);
 };

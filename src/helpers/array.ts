@@ -14,6 +14,9 @@ export const insertItemAtIndex = <TItem>(array: TItem[], item: TItem, index: num
   return [...array.slice(0, index), item, ...array.slice(index)];
 };
 
+export const removeItemById = <TItem extends Item>(array: TItem[], id: string) => {
+  return removeItemAtIndex(array, findItemIndexById(array, id));
+};
 export const moveItem = <TItem>(array: TItem[], from: number, to: number) => {
   const item = array[from];
   return insertItemAtIndex(removeItemAtIndex(array, from), item, to);

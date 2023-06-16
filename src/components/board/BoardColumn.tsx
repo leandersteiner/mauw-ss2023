@@ -22,17 +22,19 @@ export const BoardColumn = ({ id, title, index, tasks, onMove }: BoardColumnProp
 
     onMove(result.draggableId, result.destination.index);
   };
-  const tasksNode = tasks.map(task => (
-    <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
-      {({ innerRef, draggableProps, dragHandleProps }) => (
-        <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
-          <div key={task.id} style={{ paddingBottom: '5px' }}>
-            <BoardColumnTask id={task.id} title={task.name} />
+  const tasksNode = tasks
+    .sort((a, b) => a.position - b.position)
+    .map(task => (
+      <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
+        {({ innerRef, draggableProps, dragHandleProps }) => (
+          <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
+            <div key={task.id} style={{ paddingBottom: '5px' }}>
+              <BoardColumnTask id={task.id} title={task.name} />
+            </div>
           </div>
-        </div>
-      )}
-    </Draggable>
-  ));
+        )}
+      </Draggable>
+    ));
 
   return (
     <StrictModeDroppable

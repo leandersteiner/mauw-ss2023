@@ -1,6 +1,6 @@
 import { Col, Row } from 'antd';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BoardColumn } from './BoardColumn';
 import { DroppableTypes } from '../../constants/DroppableTypes';
@@ -9,7 +9,7 @@ import { AddNewItem } from './AddNewItem';
 import { TaskResponse, updateTask } from '../../api/taskApi';
 import { Task } from '../../models/task/Task';
 import { Board as BoardModel } from '../../models/board/Board';
-import { moveInList } from '../../helpers/drag';
+import { moveInList, moveTaskBetweenColumns } from '../../helpers/drag';
 import {
   BoardColumnResponse,
   updateBoardColumn,
@@ -24,23 +24,32 @@ type BoardProps = {
 };
 
 export const Board = ({ projectId, board: model }: BoardProps) => {
+  const queryClient = useQueryClient();
   const [board, setBoard] = useState<BoardModel>(model);
+  const [dragging, setDragging] = useState(false);
   const updateTaskMutation = useMutation<TaskResponse, Error, Task>({
-    mutationFn: updateTask(projectId)
+    mutationFn: updateTask(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
   });
   const updateColumnMutation = useMutation<BoardColumnResponse, Error, UpdateBoardColumnRequest>({
-    mutationFn: updateBoardColumn(projectId)
+    mutationFn: updateBoardColumn(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
   });
 
   const handleCardMoved = (cardId: string, columnId: string, index: number) => {
+    let oldColumn = board.columns.find(col => {
+      return !!col.tasks.find(task => task.id === cardId);
+    });
+    if (!oldColumn) return;
     const newColumn = board.columns.find(column => column.id === columnId);
     if (!newColumn) return;
-    const updatedTask = newColumn.tasks.find(task => task.id === cardId);
-    if (!updatedTask) return;
-    updatedTask.boardColumnId = columnId;
-    updatedTask.position = index;
-    updateTaskMutation.mutate(updatedTask);
-    setBoard(board);
+    const task = oldColumn.tasks.find(task => task.id === cardId);
+    if (!task) return;
+    task.boardColumnId = columnId;
+    oldColumn = moveTaskBetweenColumns(oldColumn, newColumn, task);
+    setBoard({ ...board });
+    oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+    newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
   };
 
   const handleListMoved = (id: string, index: number) => {
@@ -53,12 +62,17 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
     );
   };
 
+  const handleDragStart = () => {
+    setDragging(true);
+  };
+
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, type } = result;
     if (
       !destination ||
       (destination.droppableId === source.droppableId && destination.index === source.index)
     ) {
+      setDragging(false);
       return;
     }
 
@@ -73,11 +87,17 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
         break;
       default:
     }
+    setDragging(false);
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <StrictModeDroppable droppableId='board' type={DroppableTypes.COLUMN} direction='horizontal'>
+    <DragDropContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+      <StrictModeDroppable
+        droppableId='board'
+        type={DroppableTypes.COLUMN}
+        direction='horizontal'
+        isDropDisabled={!dragging}
+      >
         {({ innerRef, droppableProps, placeholder }) => (
           <Row style={{ height: '100%' }} ref={innerRef} {...droppableProps} data-drag-scroller>
             <Col key='board-backlog' flex='auto' style={{ height: '100%' }}>
@@ -96,6 +116,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
                   key={column.id}
                   draggableId={`column:${column.id}`}
                   index={column.position}
+                  isDragDisabled={dragging}
                 >
                   {(provided, snapshot) => (
                     <Col
