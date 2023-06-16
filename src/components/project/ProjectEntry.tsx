@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import Title from 'antd/es/typography/Title';
 import { deleteProject } from '../../api/projectsApi';
@@ -40,7 +40,7 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
       <span style={buttonContainerStyle}>
         <Tooltip title='Add user'>
           <Button
-            icon={<PlusOutlined />}
+            icon={<UserAddOutlined />}
             disabled={!(props.project.owner.username === user?.username)}
           />
         </Tooltip>

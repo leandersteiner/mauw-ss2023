@@ -8,9 +8,17 @@ import { getProjects } from '../../api/projectsApi';
 import { ProjectEntry } from '../../components/project/ProjectEntry';
 import { CreateProjectModal } from '../../components/project/CreateProjectModal';
 
+const topBarStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+  marginBottom: '10px'
+};
+
 export const Projects = () => {
+  const { setPath } = usePathContext();
+
   const [projects, setProjects] = useState<Project[]>();
-  const [isCreateProjectModalOpen, setisCreateProjectModalOpen] = useState(false);
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
 
   const { mutate: getUsersProjects } = useMutation(getProjects, {
     onSuccess: (response: Project[]) => {
@@ -18,31 +26,23 @@ export const Projects = () => {
     }
   });
 
-  const { setPath } = usePathContext();
   useEffect(() => setPath('projects'), [setPath]);
   useEffect(() => getUsersProjects(), [getUsersProjects]);
-
-  const topBarStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginBottom: '10px'
-  };
 
   return (
     <span>
       <CreateProjectModal
         isCreateProjectModalOpen={isCreateProjectModalOpen}
-        setIsCreateProjectModalOpen={setisCreateProjectModalOpen}
+        setIsCreateProjectModalOpen={setIsCreateProjectModalOpen}
       />
       <div style={topBarStyle}>
-        <Button icon={<PlusOutlined />} onClick={() => setisCreateProjectModalOpen(true)}>
+        <Button icon={<PlusOutlined />} onClick={() => setIsCreateProjectModalOpen(true)}>
           Create Project
         </Button>
       </div>
       <div>
         {projects?.map(project => {
-          // eslint-disable-next-line react/jsx-key
-          return <ProjectEntry project={project} />;
+          return <ProjectEntry project={project} key={project.id} />;
         })}
       </div>
     </span>

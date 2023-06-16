@@ -16,6 +16,12 @@ export interface Project {
 }
 
 export interface CreateProjectRequest {
+  orgId: string;
+  teamId: string;
+  body: CreateProjectBodyData;
+}
+
+export interface CreateProjectBodyData {
   name: string;
   private: boolean;
 }
