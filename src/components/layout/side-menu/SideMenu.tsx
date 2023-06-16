@@ -2,6 +2,7 @@ import { Menu } from 'antd';
 import { CSSProperties, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useAuth } from '../../../context/AuthContext';
 import {
   MenuItem,
@@ -41,7 +42,13 @@ export const SideMenu: React.FC = () => {
   const { token } = useAuth();
   const { path } = usePathContext();
 
-  const [topEntries, setTopEntries] = useState<MenuItem[]>();
+  const [topEntries, setTopEntries] = useState<MenuItem[]>(
+    Array.of({
+      label: '',
+      icon: <LoadingOutlined />,
+      key: 'loading'
+    })
+  );
   const bottomEntries = token
     ? createLoggedInBottomSideMenuEntries(navigator)
     : createLoggedOutBottomSideMenuEntries(navigator);
