@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
+import { Button, Col, Row } from 'antd';
 import { usePathContext } from '../../context/PathContext';
 import { Project } from '../../models/project/Project';
 import { getProjects } from '../../api/projectsApi';
@@ -40,11 +40,16 @@ export const Projects = () => {
           Create Project
         </Button>
       </div>
-      <div>
+
+      <Row gutter={[16, 16]}>
         {projects?.map(project => {
-          return <ProjectEntry project={project} key={project.id} />;
+          return (
+            <Col xs={14} sm={12} md={10} lg={8} xl={6} key={project.id}>
+              <ProjectEntry project={project} key={project.id} />
+            </Col>
+          );
         })}
-      </div>
+      </Row>
     </span>
   );
 };
