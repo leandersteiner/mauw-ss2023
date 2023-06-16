@@ -1,78 +1,68 @@
 import { Menu } from 'antd';
-import { CSSProperties, useEffect } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useMutation } from '@tanstack/react-query';
-import { ProjectOutlined } from '@ant-design/icons';
-import { SideMenuEntry, toMenuItemArray } from './SideMenuUtils';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../../context/AuthContext';
 import {
-  loggedInBottomSideMenuEntries,
-  loggedInTopSideMenuEntries,
-  loggedOutBottomSideMenuEntries,
-  loggedOutTopSideMenuEntries
+  MenuItem,
+  createLoggedInBottomSideMenuEntries,
+  createLoggedInTopSideMenuEntries,
+  createLoggedOutBottomSideMenuEntries,
+  createLoggedOutTopSideMenuEntries
 } from './SideMenuEntries';
 import { usePathContext } from '../../../context/PathContext';
 import { getProjects } from '../../../api/projectsApi';
 import { Project } from '../../../models/project/Project';
 
+const menuWrapperStyle: CSSProperties = {
+  overflow: 'auto',
+  height: '100%'
+};
+
+const menuContatinerStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  flexDirection: 'column',
+  height: '90%'
+};
+
+const bottomMenuStyle: CSSProperties = {
+  marginBottom: 'auto'
+};
+
+const logo: CSSProperties = {
+  height: 32,
+  margin: 17,
+  background: 'rgba(255, 255, 255, 0.2)'
+};
+
 export const SideMenu: React.FC = () => {
   const navigator = useNavigate();
   const { token } = useAuth();
   const { path } = usePathContext();
-  let topEntries = token ? loggedInTopSideMenuEntries : loggedOutTopSideMenuEntries;
-  const bottomEntries = token ? loggedInBottomSideMenuEntries : loggedOutBottomSideMenuEntries;
 
-  const { mutate: getUsersProjects } = useMutation(getProjects, {
-    onSuccess: (response: Project[]) => {
-      const entries = response.map(project => {
-        return {
-          label: project.name,
-          key: project.name,
-          icon: null,
-          url: ''
-        } as SideMenuEntry;
-      });
+  const [topEntries, setTopEntries] = useState<MenuItem[]>();
+  const bottomEntries = token
+    ? createLoggedInBottomSideMenuEntries(navigator)
+    : createLoggedOutBottomSideMenuEntries(navigator);
 
-      const projectsEntry: SideMenuEntry = {
-        label: 'Projects',
-        key: 'projects',
-        icon: <ProjectOutlined />,
-        url: '/home/projects',
-        childEntries: entries
-      };
-
-      const newEntries = loggedInTopSideMenuEntries;
-      newEntries[newEntries.length - 1] = projectsEntry;
-
-      topEntries = newEntries;
-    }
+  const { isLoading, isError, error, data } = useQuery<Project[], Error>({
+    queryKey: ['projects'],
+    queryFn: getProjects,
+    enabled: !!token
   });
 
   useEffect(() => {
-    getUsersProjects();
-  }, [getUsersProjects]);
+    if (data !== undefined) {
+      setTopEntries(createLoggedInTopSideMenuEntries(navigator, data));
+    }
+  }, [data, navigator]);
 
-  const menuWrapperStyle: CSSProperties = {
-    overflow: 'auto',
-    height: '100%'
-  };
-
-  const menuContatinerStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'column',
-    height: '90%'
-  };
-
-  const bottomMenuStyle: CSSProperties = {
-    marginBottom: 'auto'
-  };
-
-  const logo: CSSProperties = {
-    height: 32,
-    margin: 17,
-    background: 'rgba(255, 255, 255, 0.2)'
-  };
+  useEffect(() => {
+    if (!token) {
+      setTopEntries(createLoggedOutTopSideMenuEntries(navigator));
+    }
+  }, [navigator, token]);
 
   return (
     <div style={menuWrapperStyle}>
@@ -82,8 +72,9 @@ export const SideMenu: React.FC = () => {
           <Menu
             theme='dark'
             mode='inline'
-            items={toMenuItemArray(topEntries, navigator)}
+            items={topEntries}
             selectedKeys={[path]}
+            defaultOpenKeys={['projectsList']}
           />
         </div>
         <div>
@@ -92,7 +83,7 @@ export const SideMenu: React.FC = () => {
             style={bottomMenuStyle}
             theme='dark'
             mode='inline'
-            items={toMenuItemArray(bottomEntries, navigator)}
+            items={bottomEntries}
             selectedKeys={[path]}
           />
         </div>

@@ -8,70 +8,106 @@ import {
   UserAddOutlined,
   UserOutlined
 } from '@ant-design/icons';
-import { SideMenuEntry } from './SideMenuUtils';
+import { NavigateFunction } from 'react-router';
+import { MenuProps } from 'antd';
+import { Project } from '../../../models/project/Project';
 
-const home: SideMenuEntry = {
-  label: 'Home',
-  key: 'home',
-  icon: <HomeOutlined />,
-  url: '/home'
-};
+export type MenuItem = Required<MenuProps>['items'][number];
 
-const organisations: SideMenuEntry = {
-  label: 'Organisations',
-  key: 'organisations',
-  icon: <UngroupOutlined />,
-  url: '/home/orgs'
-};
+export function createLoggedInTopSideMenuEntries(
+  navigate: NavigateFunction,
+  projects: Project[]
+): MenuItem[] {
+  const homeEntry: MenuItem = {
+    label: 'Home',
+    icon: <HomeOutlined />,
+    key: 'home',
+    onClick: () => navigate('/home' ?? '/')
+  };
 
-const projectsEntry: SideMenuEntry = {
-  label: 'Projects',
-  key: 'projects',
-  icon: <ProjectOutlined />,
-  url: '/home/projects'
-};
+  const organisationsEntry: MenuItem = {
+    label: 'Organisations',
+    icon: <UngroupOutlined />,
+    key: 'organisations',
+    onClick: () => navigate('/home/orgs' ?? '/')
+  };
 
-const settings: SideMenuEntry = {
-  label: 'Settings',
-  key: 'settings',
-  icon: <SettingOutlined />,
-  url: '/home/settings'
-};
+  const projectChildEntries: MenuItem[] = projects.map(project => {
+    return {
+      label: project.name,
+      icon: null,
+      key: project.id,
+      onClick: () => navigate(`/home/projects/${project.id}/boards` ?? '/')
+    } as MenuItem;
+  });
 
-const profile: SideMenuEntry = {
-  label: 'Profile',
-  key: 'profile',
-  icon: <UserOutlined />,
-  url: '/user'
-};
+  projectChildEntries.push({
+    label: 'All Projects',
+    icon: <ProjectOutlined />,
+    key: 'projects',
+    onClick: () => navigate('/home/projects' ?? '/')
+  } as MenuItem);
 
-const logout: SideMenuEntry = {
-  label: 'Logout',
-  key: 'logout',
-  icon: <LogoutOutlined />,
-  url: '/auth/logout'
-};
+  const projectEntry: MenuItem = {
+    label: 'Projects',
+    icon: <ProjectOutlined />,
+    key: 'recentProjects',
+    children: projectChildEntries
+  };
 
-const login: SideMenuEntry = {
-  label: 'Login',
-  key: 'login',
-  icon: <LoginOutlined />,
-  url: '/auth/login'
-};
+  return Array.of(homeEntry, organisationsEntry, projectEntry);
+}
 
-const register: SideMenuEntry = {
-  label: 'Register',
-  key: 'register',
-  icon: <UserAddOutlined />,
-  url: '/auth/register'
-};
+export function createLoggedInBottomSideMenuEntries(navigate: NavigateFunction): MenuItem[] {
+  const settings: MenuItem = {
+    label: 'Settings',
+    icon: <SettingOutlined />,
+    key: 'settings',
+    onClick: () => navigate('/home/settings' ?? '/')
+  };
 
-export const loggedInTopSideMenuEntries: SideMenuEntry[] = Array.of(
-  home,
-  organisations,
-  projectsEntry
-);
-export const loggedInBottomSideMenuEntries: SideMenuEntry[] = Array.of(profile, logout, settings);
+  const profile: MenuItem = {
+    label: 'Profile',
+    icon: <UserOutlined />,
+    key: 'profile',
+    onClick: () => navigate('/user' ?? '/')
+  };
 
-export const loggedOutTopSideMenuEntries: SideMenuEntry[] = Array.of(home);
-export const loggedOutBottomSideMenuEntries: SideMenuEntry[] = Array.of(login, register);
+  const logout: MenuItem = {
+    label: 'Logout',
+    icon: <LogoutOutlined />,
+    key: 'logout',
+    onClick: () => navigate('/auth/logout' ?? '/')
+  };
+
+  return Array.of(settings, profile, logout);
+}
+
+export function createLoggedOutTopSideMenuEntries(navigate: NavigateFunction): MenuItem[] {
+  const homeEntry: MenuItem = {
+    label: 'Home',
+    icon: <HomeOutlined />,
+    key: 'home',
+    onClick: () => navigate('/home' ?? '/')
+  };
+
+  return Array.of(homeEntry);
+}
+
+export function createLoggedOutBottomSideMenuEntries(navigate: NavigateFunction): MenuItem[] {
+  const login: MenuItem = {
+    label: 'Login',
+    icon: <LoginOutlined />,
+    key: 'login',
+    onClick: () => navigate('/auth/login' ?? '/')
+  };
+
+  const register: MenuItem = {
+    label: 'Register',
+    icon: <UserAddOutlined />,
+    key: 'register',
+    onClick: () => navigate('/auth/register' ?? '/')
+  };
+
+  return Array.of(login, register);
+}
