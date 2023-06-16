@@ -5,6 +5,7 @@ import Title from 'antd/es/typography/Title';
 import { deleteProject } from '../../api/projectsApi';
 import { Project } from '../../models/project/Project';
 import { useAuth } from '../../context/AuthContext';
+import { DateUtils } from '../../helpers/date';
 
 type ProjectEntryProps = {
   project: Project;
@@ -12,6 +13,8 @@ type ProjectEntryProps = {
 
 const buttonContainerStyle: CSSProperties = {
   display: 'flex',
+  alignContent: 'center',
+  alignItems: 'center',
   gap: '10px'
 };
 
@@ -51,6 +54,15 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
     width: '100%'
   };
 
+  const projectFooterStyle: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    marginTop: '15px'
+  };
+
   return (
     <div
       style={projectEntryStyle}
@@ -67,7 +79,7 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
         </Typography.Title>
 
         <span style={userAvatarStyle}>
-          <Title style={{ margin: '0' }} level={5}>
+          <Title style={{ margin: '0' }} level={5} ellipsis={{ rows: 1, tooltip: true }}>
             {props.project.owner.username}
           </Title>
           <Avatar size='small' icon={<UserOutlined />} />
@@ -78,28 +90,38 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
         {props.project.team.name}
       </Title>
 
-      <span style={buttonContainerStyle}>
-        <Tooltip title='Add user'>
-          <Button
-            icon={<UserAddOutlined />}
-            disabled={!(props.project.owner.username === user?.username)}
-          />
-        </Tooltip>
+      <Typography.Paragraph style={{ margin: '0' }}>
+        {props.project.private ? 'private' : 'public'}
+      </Typography.Paragraph>
 
-        <Tooltip title='Delete'>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() =>
-              deleteProject(
-                props.project.team.organisation.id,
-                props.project.team.id,
-                props.project.id
-              )
-            }
-            disabled={!(props.project.owner.username === user?.username)}
-          />
-        </Tooltip>
+      <span style={projectFooterStyle}>
+        <span style={buttonContainerStyle}>
+          <Tooltip title='Add user'>
+            <Button
+              icon={<UserAddOutlined />}
+              disabled={!(props.project.owner.username === user?.username)}
+            />
+          </Tooltip>
+
+          <Tooltip title='Delete'>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() =>
+                deleteProject(
+                  props.project.team.organisation.id,
+                  props.project.team.id,
+                  props.project.id
+                )
+              }
+              disabled={!(props.project.owner.username === user?.username)}
+            />
+          </Tooltip>
+        </span>
+
+        <Typography.Paragraph style={{ margin: '0' }}>
+          {DateUtils.toDateString(props.project.updatedAt.toLocaleString())}
+        </Typography.Paragraph>
       </span>
     </div>
   );
