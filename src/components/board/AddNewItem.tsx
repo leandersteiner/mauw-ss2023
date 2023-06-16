@@ -5,12 +5,11 @@ import { NewItemForm } from './NewItemForm';
 type AddNewItemProps = {
   onAdd: (text: string) => void;
   toggleButtonText: string;
-  dark?: boolean;
 };
 
 export const AddNewItem = (props: AddNewItemProps) => {
   const [showForm, setShowForm] = useState(false);
-  const { onAdd, toggleButtonText, dark } = props;
+  const { onAdd, toggleButtonText } = props;
 
   if (showForm) {
     return (
