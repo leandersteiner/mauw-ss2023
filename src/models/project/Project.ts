@@ -27,5 +27,12 @@ export interface CreateProjectBodyData {
 }
 
 export interface AddUserToProjectRequest {
+  orgId: string;
+  teamId: string;
+  projectId: string;
+  body: AddUserToProjectBodyData;
+}
+
+export interface AddUserToProjectBodyData {
   userId: string;
 }

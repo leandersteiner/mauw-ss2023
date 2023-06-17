@@ -20,14 +20,12 @@ export const createProject = (createProjectRequest: CreateProjectRequest) =>
     )
     .then(res => res.data);
 
-export const addUserToProject = (
-  orgId: string,
-  teamId: string,
-  projectId: string,
-  addUserToProjectRequest: AddUserToProjectRequest
-) =>
+export const addUserToProject = (addUserToProjectRequest: AddUserToProjectRequest) =>
   api
-    .post<Project>(`orgs/${orgId}/teams/${teamId}/projects/${projectId}`, addUserToProjectRequest)
+    .post<Project>(
+      `orgs/${addUserToProjectRequest.orgId}/teams/${addUserToProjectRequest.teamId}/projects/${addUserToProjectRequest.projectId}`,
+      addUserToProjectRequest.body
+    )
     .then(res => res.data);
 
 export const deleteProject = (orgId: string, teamId: string, projectId: string) =>
