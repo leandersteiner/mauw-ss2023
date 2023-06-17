@@ -1,7 +1,8 @@
-import { CSSProperties, ReactNode, useState } from 'react';
+import { CSSProperties, useState } from 'react';
 import { DeleteOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Tooltip, Typography } from 'antd';
+import { Avatar, Button, Tooltip } from 'antd';
 import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
 import { deleteProject } from '../../api/projectsApi';
 import { Project } from '../../models/project/Project';
 import { useAuth } from '../../context/AuthContext';
@@ -71,21 +72,19 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
       onMouseLeave={() => setIsHover(false)}
     >
       <AddUserModal
-        teamId={props.project.team.id}
-        orgId={props.project.team.organisation.id}
-        projectId={props.project.id}
+        project={props.project}
         isAddUserModalOpen={isAddUserModalOpen}
         setIsAddUserModalOpen={setIsAddUserModalOpen}
       />
 
       <span style={projectHeaderStyle}>
-        <Typography.Title
+        <Title
           style={{ margin: '0', maxWidth: '50%' }}
           level={4}
           ellipsis={{ rows: 1, tooltip: true }}
         >
           {props.project.name}
-        </Typography.Title>
+        </Title>
 
         <span style={userAvatarStyle}>
           <Title style={{ margin: '0' }} level={5} ellipsis={{ rows: 1, tooltip: true }}>
@@ -99,9 +98,7 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
         {props.project.team.name}
       </Title>
 
-      <Typography.Paragraph style={{ margin: '0' }}>
-        {props.project.private ? 'private' : 'public'}
-      </Typography.Paragraph>
+      <Paragraph style={{ margin: '0' }}>{props.project.private ? 'private' : 'public'}</Paragraph>
 
       <span style={projectFooterStyle}>
         <span style={buttonContainerStyle}>
@@ -129,9 +126,9 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
           </Tooltip>
         </span>
 
-        <Typography.Paragraph style={{ margin: '0' }}>
+        <Paragraph style={{ margin: '0' }}>
           {DateUtils.toDateString(props.project.updatedAt.toLocaleString())}
-        </Typography.Paragraph>
+        </Paragraph>
       </span>
     </div>
   );
