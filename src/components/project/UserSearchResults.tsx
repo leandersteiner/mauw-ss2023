@@ -1,12 +1,11 @@
 import { CSSProperties } from 'react';
 import { User } from '../../models/user/User';
 import { UserSearchResult } from './UserSearchResult';
+import { Project } from '../../models/project/Project';
 
 type UserSearchResultsProps = {
   users: User[];
-  projectId: string;
-  teamId: string;
-  orgId: string;
+  project: Project;
   setMembers: React.Dispatch<React.SetStateAction<User[]>>;
 };
 
@@ -34,8 +33,8 @@ export const UserSearchResults: React.FC<UserSearchResultsProps> = (
   props: UserSearchResultsProps
 ) => {
   const checkIsMember = (userId: string): boolean => {
-    const foundUsers: User | undefined = props.users.find(user => user.id === userId);
-    return foundUsers !== undefined;
+    const foundUser: User | undefined = props.project.members.find(user => user.id === userId);
+    return foundUser !== undefined;
   };
 
   return (
@@ -46,9 +45,9 @@ export const UserSearchResults: React.FC<UserSearchResultsProps> = (
             <UserSearchResult
               user={user}
               isMember={checkIsMember(user.id)}
-              projectId={props.projectId}
-              orgId={props.orgId}
-              teamId={props.teamId}
+              projectId={props.project.id}
+              orgId={props.project.team.organisation.id}
+              teamId={props.project.team.id}
               setMembers={props.setMembers}
             />
           </span>

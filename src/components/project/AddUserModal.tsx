@@ -80,13 +80,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = (props: AddUserModalPro
 
       {notFound}
 
-      <UserSearchResults
-        users={foundUsers}
-        orgId={props.project.team.organisation.id}
-        teamId={props.project.team.id}
-        projectId={props.project.id}
-        setMembers={setMembers}
-      />
+      <UserSearchResults users={foundUsers} project={props.project} setMembers={setMembers} />
 
       <Divider>Members</Divider>
 
