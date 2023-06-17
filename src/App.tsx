@@ -1,15 +1,18 @@
 import React from 'react';
-import { DatePicker } from 'antd';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
-import { HomePage } from './components/start/HomePage';
+import { HomePage } from './views/home/HomePage';
 import { RegistrationForm } from './components/auth/RegistrationForm';
 import { LoginForm } from './components/auth/LoginForm';
 import { Logout } from './components/auth/Logout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Profile } from './views/user/Profile';
+import { Settings } from './views/settings/Settings';
+import { Organisations } from './views/organisations/Organisations';
+import { Projects } from './views/projects/Projects';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,9 +48,10 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path='boards' element={<DatePicker />} />
-              <Route path='settings' element={<DatePicker />} />
-              <Route path='create-project' element={<DatePicker />} />
+              <Route path='projects' element={<Projects />} />
+              <Route path='projects/:projectId/boards' element={<Settings />} />
+              <Route path='settings' element={<Settings />} />
+              <Route path='orgs' element={<Organisations />} />
             </Route>
           </Routes>
         </BrowserRouter>
