@@ -85,7 +85,7 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
       />
 
       <span style={projectHeaderStyle}>
-        <Tooltip placement='top' title='Open Project'>
+        <Tooltip placement='bottom' title='Open Project'>
           <Title
             style={{ margin: '0', maxWidth: '50%' }}
             level={4}
