@@ -7,6 +7,7 @@ import { Project } from '../../models/project/Project';
 import { getProjects } from '../../api/projectsApi';
 import { ProjectEntry } from '../../components/project/ProjectEntry';
 import { CreateProjectModal } from '../../components/project/CreateProjectModal';
+import { DateUtils } from '../../helpers/date';
 
 const topBarStyle: CSSProperties = {
   display: 'flex',
@@ -29,7 +30,11 @@ export const Projects = () => {
 
   useEffect(() => {
     if (data !== undefined) {
-      setProjects(data);
+      setProjects(
+        data.sort((a, b) => {
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        })
+      );
     }
   }, [data]);
 
