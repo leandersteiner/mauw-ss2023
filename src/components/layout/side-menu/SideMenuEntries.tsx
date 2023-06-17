@@ -32,14 +32,19 @@ export function createLoggedInTopSideMenuEntries(
     onClick: () => navigate('/home/orgs' ?? '/')
   };
 
-  const projectChildEntries: MenuItem[] = projects.map(project => {
-    return {
-      label: project.name,
-      icon: null,
-      key: project.id,
-      onClick: () => navigate(`/home/projects/${project.id}/boards` ?? '/')
-    } as MenuItem;
-  });
+  const projectChildEntries: MenuItem[] = projects
+    .sort((a, b) => {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    })
+    .map(project => {
+      return {
+        label: project.name,
+        icon: null,
+        key: project.id,
+        onClick: () => navigate(`/home/projects/${project.id}/boards` ?? '/')
+      } as MenuItem;
+    })
+    .slice(0, 8);
 
   projectChildEntries.push({
     label: 'All Projects',
