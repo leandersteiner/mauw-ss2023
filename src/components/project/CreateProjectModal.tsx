@@ -45,6 +45,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = (
       const { projects } = props;
       projects.push(response);
       props.setProjects(projects);
+      setIsValid(false);
     },
     onError: (e: Error) => {
       alert(e.message);

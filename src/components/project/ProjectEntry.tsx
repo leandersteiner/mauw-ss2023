@@ -3,6 +3,7 @@ import { DeleteOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons
 import { Avatar, Button, Tooltip } from 'antd';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import { useNavigate } from 'react-router';
 import { deleteProject } from '../../api/projectsApi';
 import { Project } from '../../models/project/Project';
 import { useAuth } from '../../context/AuthContext';
@@ -21,6 +22,7 @@ const buttonContainerStyle: CSSProperties = {
 };
 
 export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryProps) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [isHover, setIsHover] = useState(false);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState<boolean>(false);
@@ -65,8 +67,13 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
     marginTop: '15px'
   };
 
+  const navigateToProject = () => {
+    navigate(`/home/projects/${props.project.id}/boards` ?? '/');
+  };
+
   return (
     <div
+      role='presentation'
       style={projectEntryStyle}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
@@ -78,14 +85,16 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
       />
 
       <span style={projectHeaderStyle}>
-        <Title
-          style={{ margin: '0', maxWidth: '50%' }}
-          level={4}
-          ellipsis={{ rows: 1, tooltip: true }}
-        >
-          {props.project.name}
-        </Title>
-
+        <Tooltip placement='top' title='Open Project'>
+          <Title
+            style={{ margin: '0', maxWidth: '50%' }}
+            level={4}
+            ellipsis={{ rows: 1, tooltip: true }}
+            onClick={navigateToProject}
+          >
+            {props.project.name}
+          </Title>
+        </Tooltip>
         <span style={userAvatarStyle}>
           <Title style={{ margin: '0' }} level={5} ellipsis={{ rows: 1, tooltip: true }}>
             {props.project.owner.username}
