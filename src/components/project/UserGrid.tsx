@@ -42,7 +42,7 @@ export const UserGrid: React.FC<UserGridProps> = (props: UserGridProps) => {
         </Title>
       </span>
 
-      <Row gutter={[16, 4]}>
+      <Row gutter={[16, 4]} justify='center'>
         {props.members.map(user => {
           return (
             <Col xs={10} sm={10} md={10} lg={8} xl={8} key={user.id} style={{ marginTop: '20px' }}>

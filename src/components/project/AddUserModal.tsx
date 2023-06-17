@@ -6,7 +6,7 @@ import { User } from '../../models/user/User';
 import { getAllUsers } from '../../api/userApi';
 import { UserGrid } from './UserGrid';
 import { Project } from '../../models/project/Project';
-import { UserSearchResult } from './UserSearchResults';
+import { UserSearchResults } from './UserSearchResults';
 
 type AddUserModalProps = {
   project: Project;
@@ -80,7 +80,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = (props: AddUserModalPro
 
       {notFound}
 
-      <UserSearchResult
+      <UserSearchResults
         users={foundUsers}
         orgId={props.project.team.organisation.id}
         teamId={props.project.team.id}
@@ -88,7 +88,7 @@ export const AddUserModal: React.FC<AddUserModalProps> = (props: AddUserModalPro
         setMembers={setMembers}
       />
 
-      <Divider />
+      <Divider>Members</Divider>
 
       <UserGrid owner={props.project.owner} members={members} />
     </Modal>
