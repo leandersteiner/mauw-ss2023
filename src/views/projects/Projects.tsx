@@ -17,7 +17,7 @@ const topBarStyle: CSSProperties = {
 export const Projects = () => {
   const { setPath } = usePathContext();
 
-  const [projects, setProjects] = useState<Project[]>();
+  const [projects, setProjects] = useState<Project[]>([]);
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
 
   const { isLoading, isError, error, data } = useQuery<Project[], Error>({
@@ -42,6 +42,8 @@ export const Projects = () => {
       <CreateProjectModal
         isCreateProjectModalOpen={isCreateProjectModalOpen}
         setIsCreateProjectModalOpen={setIsCreateProjectModalOpen}
+        projects={projects}
+        setProjects={setProjects}
       />
       <div style={topBarStyle}>
         <Button icon={<PlusOutlined />} onClick={() => setIsCreateProjectModalOpen(true)}>

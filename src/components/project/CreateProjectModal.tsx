@@ -18,6 +18,8 @@ const createProjectModalBodyStyle: CSSProperties = {
 type CreateProjectModalProps = {
   isCreateProjectModalOpen: boolean;
   setIsCreateProjectModalOpen: Dispatch<React.SetStateAction<boolean>>;
+  projects: Project[];
+  setProjects: Dispatch<React.SetStateAction<Project[]>>;
 };
 
 export const CreateProjectModal: React.FC<CreateProjectModalProps> = (
@@ -40,6 +42,9 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = (
   const { mutate: createProjectMutation } = useMutation(createProject, {
     onSuccess: (response: Project) => {
       props.setIsCreateProjectModalOpen(false);
+      const { projects } = props;
+      projects.push(response);
+      props.setProjects(projects);
     },
     onError: (e: Error) => {
       alert(e.message);
