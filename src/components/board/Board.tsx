@@ -310,11 +310,11 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
       >
         {({ innerRef, droppableProps, placeholder }) => (
           <Space
+            style={{ height: '100%', overflowX: 'hidden' }}
             ref={innerRef}
-            {...droppableProps}
-            style={{ background: 'green', height: '100%', overflowX: 'auto' }}
             align='start'
-            size='large'
+            {...droppableProps}
+            size='middle'
           >
             <BoardColumn
               onTaskCreated={handleTaskCreated}
@@ -325,7 +325,6 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
               id={BACKLOG_ID}
               title='Backlog'
             />
-
             {board.columns
               .sort((a, b) => a.position - b.position)
               .map(column => (
@@ -338,10 +337,10 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                   {(provided, snapshot) => (
                     <div
                       key={column.id}
+                      style={{ width: '272px' }}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      style={{ width: '272px' }}
                     >
                       <BoardColumn
                         onTaskCreated={handleTaskCreated}
@@ -357,7 +356,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                 </Draggable>
               ))}
             {placeholder}
-            <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add column' />
+            <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
           </Space>
         )}
       </StrictModeDroppable>

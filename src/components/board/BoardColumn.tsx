@@ -1,7 +1,7 @@
 import './scrollbar.css';
 import { Draggable } from 'react-beautiful-dnd';
 import { Button, Col, Row, Space, Tooltip } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { BoardColumnTask } from './BoardColumnTask';
@@ -69,7 +69,7 @@ export const BoardColumn = ({
               <Tooltip title='Delete Column'>
                 <Button
                   type='primary'
-                  icon={<DeleteOutlined />}
+                  icon={<CloseOutlined />}
                   danger
                   size='small'
                   onClick={() => onColumnDeleted(id)}
