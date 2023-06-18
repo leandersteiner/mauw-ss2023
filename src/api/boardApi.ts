@@ -5,7 +5,7 @@ import { BoardColumn } from '../models/board/BoardColumn';
 export type BoardResponse = Board;
 export type BoardColumnResponse = BoardColumn;
 
-export type UpdateBoardColumnRequest = { columnId: string; data: BoardColumn };
+export type UpdateBoardColumnRequest = { columnId: string; data: Partial<BoardColumn> };
 export type CreateBoardColumnRequest = Partial<BoardColumn>;
 
 export const getBoard = (projectId: string) =>

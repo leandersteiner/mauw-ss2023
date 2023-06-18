@@ -7,20 +7,26 @@ import { Board } from '../../components/board/Board';
 import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
 import { BoardResponse, getBoard } from '../../api/boardApi';
+import { BacklogTasksResponse, getBacklogTasks } from '../../api/taskApi';
 
 export const BoardView = () => {
   const { orgId, teamId, projectId } = useParams();
   const { user } = useAuth();
   const { setPath } = usePathContext();
   useEffect(() => setPath('board'));
-  const { isLoading, isError, error, data } = useQuery<BoardResponse, Error>({
+  const boardQuery = useQuery<BoardResponse, Error>({
     queryKey: ['board'],
     queryFn: () => getBoard(projectId ?? '')
   });
 
+  const backlogQuery = useQuery<BacklogTasksResponse, Error>({
+    queryKey: ['backlog'],
+    queryFn: () => getBacklogTasks(projectId ?? '')
+  });
+
   if (!projectId || !teamId || !projectId || !orgId || !user) return <Navigate to='/home' />;
 
-  if (isLoading) {
+  if (boardQuery.isLoading || backlogQuery.isLoading) {
     return (
       <Space direction='vertical' style={{ width: '100%' }}>
         <Spin tip='Loading' size='large'>
@@ -30,9 +36,14 @@ export const BoardView = () => {
     );
   }
 
-  if (isError) {
-    return <div>There was an unexpected error: {error.message}</div>;
+  if (boardQuery.isError || backlogQuery.isError) {
+    return (
+      <div>
+        There was an unexpected error: {boardQuery.error?.message}
+        {backlogQuery.error?.message}
+      </div>
+    );
   }
 
-  return <Board projectId={projectId} board={data} />;
+  return <Board projectId={projectId} board={boardQuery.data} backlog={backlogQuery.data} />;
 };

@@ -7,6 +7,8 @@ import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { AddNewItem } from './AddNewItem';
 import {
+  createTask,
+  CreateTaskRequest,
   createTaskState,
   CreateTaskStateRequest,
   TaskResponse,
@@ -24,16 +26,20 @@ import {
   UpdateBoardColumnRequest
 } from '../../api/boardApi';
 
+const BACKLOG_ID = 'backlog';
+
 const parseDndId = (dndId: string) => dndId.split(':')[1];
 
 type BoardProps = {
   projectId: string;
   board: BoardModel;
+  backlog: Task[];
 };
 
-export const Board = ({ projectId, board: model }: BoardProps) => {
+export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
   const queryClient = useQueryClient();
   const [board, setBoard] = useState<BoardModel>(model);
+  const [backlog, setBacklog] = useState<Task[]>(b);
   const [dragging, setDragging] = useState(false);
   const updateTaskMutation = useMutation<TaskResponse, Error, Task>({
     mutationFn: updateTask(projectId),
@@ -52,27 +58,93 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
     onSuccess: () => queryClient.invalidateQueries(['board'])
   });
 
-  const handleCardMoved = (cardId: string, columnId: string, index: number) => {
-    const oldColumn = board.columns.find(col => {
-      return !!col.tasks.find(task => task.id === cardId);
-    });
-    if (!oldColumn) return;
-    const newColumn = board.columns.find(column => column.id === columnId);
-    if (!newColumn) return;
-    const task = oldColumn.tasks.find(task => task.id === cardId);
-    if (!task) return;
-    if (oldColumn.id === newColumn.id) {
-      moveInList(oldColumn.tasks, task.position, index);
-      setBoard({ ...board });
-      board.columns.forEach(column =>
-        updateColumnMutation.mutate({ columnId: column.id, data: column })
+  const createTaskMutation = useMutation<TaskResponse, Error, CreateTaskRequest>({
+    mutationFn: createTask(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
+  });
+
+  const handleCardMoved = (taskId: string, columnId: string, index: number) => {
+    const toBacklog = columnId === BACKLOG_ID;
+    const fromBacklog = !!backlog.find(task => task.id === taskId);
+
+    if (toBacklog) {
+      if (fromBacklog) {
+        const movedTask = backlog.find(t => t.id === taskId);
+        if (!movedTask) return;
+        moveInList(backlog, movedTask.position, index);
+        setBacklog([...backlog]);
+        backlog.forEach(task => updateTaskMutation.mutate(task));
+      } else {
+        const oldColumn = board.columns.find(col => {
+          return !!col.tasks.find(task => task.id === taskId);
+        });
+        if (!oldColumn) return;
+        const movedTask = oldColumn.tasks.find(task => task.id === taskId);
+        if (!movedTask) return;
+        const { newSource, newDestination } = moveTaskBetweenColumns(
+          oldColumn.tasks,
+          oldColumn.id,
+          backlog,
+          BACKLOG_ID,
+          movedTask,
+          index
+        );
+        oldColumn.tasks = newSource;
+        movedTask.boardColumnId = null;
+        setBacklog([...newDestination]);
+        setBoard({ ...board });
+      }
+    } else if (fromBacklog) {
+      const movedTask = backlog.find(task => task.id === taskId);
+      if (!movedTask) return;
+      movedTask.boardColumnId = columnId;
+      const newColumn = board.columns.find(column => column.id === columnId);
+      if (!newColumn) return;
+      const { newSource, newDestination } = moveTaskBetweenColumns(
+        backlog,
+        BACKLOG_ID,
+        newColumn.tasks,
+        newColumn.id,
+        movedTask,
+        index
       );
-    } else {
-      task.boardColumnId = columnId;
-      moveTaskBetweenColumns(oldColumn, newColumn, task, index);
+      newColumn.tasks = newDestination;
+      setBacklog([...newSource]);
       setBoard({ ...board });
-      oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+      backlog.forEach(task => updateTaskMutation.mutate(task));
       newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+    } else {
+      const oldColumn = board.columns.find(column => {
+        return !!column.tasks.find(task => task.id === taskId);
+      });
+      if (!oldColumn) return;
+      const movedTask = oldColumn.tasks.find(task => task.id === taskId);
+      if (!movedTask) return;
+      movedTask.boardColumnId = columnId;
+      const newColumn = board.columns.find(column => column.id === columnId);
+      if (!newColumn) return;
+      if (oldColumn.id === newColumn.id) {
+        moveInList(oldColumn.tasks, movedTask.position, index);
+        setBoard({ ...board });
+        board.columns.forEach(column =>
+          updateColumnMutation.mutate({ columnId: column.id, data: column })
+        );
+      } else {
+        movedTask.boardColumnId = columnId;
+        const { newSource, newDestination } = moveTaskBetweenColumns(
+          oldColumn.tasks,
+          oldColumn.id,
+          newColumn.tasks,
+          newColumn.id,
+          movedTask,
+          index
+        );
+        oldColumn.tasks = newSource;
+        newColumn.tasks = newDestination;
+        setBoard({ ...board });
+        oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+        newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+      }
     }
   };
 
@@ -118,6 +190,24 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
     );
   };
 
+  const handleTaskAdded = (task: Task, columnId?: string) => {
+    const column = board.columns.find(column => column.id === columnId);
+    const newTask = { ...task };
+    newTask.position = column ? column.tasks.length + 1 : backlog.length + 1;
+    createTaskMutation.mutate(
+      { columnId, data: task },
+      {
+        onSuccess: task => {
+          if (columnId) {
+            if (column) column.tasks.push(task);
+          } else {
+            backlog.push(task);
+          }
+        }
+      }
+    );
+  };
+
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, type } = result;
     if (
@@ -154,10 +244,10 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
           <Row style={{ height: '100%' }} ref={innerRef} {...droppableProps} data-drag-scroller>
             <Col key='board-backlog' flex='auto' style={{ height: '100%' }}>
               <BoardColumn
-                onMove={(draggableId, index) => console.log(draggableId, index)}
-                tasks={[]}
+                onTaskCreated={(task, columnId) => console.log(task, columnId)}
+                tasks={backlog}
                 index={0}
-                id='backlog'
+                id={BACKLOG_ID}
                 title='Backlog'
               />
             </Col>
@@ -180,7 +270,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
                       {...provided.dragHandleProps}
                     >
                       <BoardColumn
-                        onMove={(draggableId, index) => console.log(draggableId, index)}
+                        onTaskCreated={(task, columnId) => console.log(task, columnId)}
                         tasks={column.tasks}
                         index={column.position}
                         id={column.id}

@@ -1,5 +1,5 @@
 import './scrollbar.css';
-import { Draggable, DropResult } from 'react-beautiful-dnd';
+import { Draggable } from 'react-beautiful-dnd';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { BoardColumnTask } from './BoardColumnTask';
@@ -11,17 +11,10 @@ export type BoardColumnProps = {
   title: string;
   index: number;
   tasks: Task[];
-  onMove: (draggableId: string, index: number) => void;
+  onTaskCreated: (task: Task, columnId?: string) => void;
 };
 
-export const BoardColumn = ({ id, title, index, tasks, onMove }: BoardColumnProps) => {
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination || result.source.index === result.destination.index) {
-      return;
-    }
-
-    onMove(result.draggableId, result.destination.index);
-  };
+export const BoardColumn = ({ id, title, index, tasks, onTaskCreated }: BoardColumnProps) => {
   const tasksNode = tasks
     .sort((a, b) => a.position - b.position)
     .map(task => (

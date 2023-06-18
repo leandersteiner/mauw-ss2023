@@ -8,6 +8,6 @@ export interface Task {
   assigneeId: string;
   stateId: string;
   sprintId: string;
-  boardColumnId: string;
+  boardColumnId: string | null;
   creatorId: string;
 }
