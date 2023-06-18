@@ -27,24 +27,26 @@ export const BoardColumn = ({
   onTaskDeleted,
   onColumnDeleted
 }: BoardColumnProps) => {
-  const tasksNode = tasks
-    .sort((a, b) => a.position - b.position)
-    .map(task => (
-      <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
-        {({ innerRef, draggableProps, dragHandleProps }) => (
-          <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
-            <div key={task.id} style={{ paddingBottom: '5px' }}>
-              <BoardColumnTask
-                id={task.id}
-                columnId={id}
-                title={task.name}
-                onTaskDeleted={onTaskDeleted}
-              />
-            </div>
-          </div>
-        )}
-      </Draggable>
-    ));
+  const tasksNode = (
+    <Space direction='vertical' style={{ width: '100%' }}>
+      {tasks
+        .sort((a, b) => a.position - b.position)
+        .map(task => (
+          <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
+            {({ innerRef, draggableProps, dragHandleProps }) => (
+              <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
+                <BoardColumnTask
+                  id={task.id}
+                  columnId={id}
+                  title={task.name}
+                  onTaskDeleted={onTaskDeleted}
+                />
+              </div>
+            )}
+          </Draggable>
+        ))}
+    </Space>
+  );
 
   return (
     <StrictModeDroppable
@@ -57,7 +59,7 @@ export const BoardColumn = ({
           {...droppableProps}
           ref={innerRef}
           direction='vertical'
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '272px', height: '100%' }}
         >
           <Row justify='space-between' align='middle'>
             <Col>

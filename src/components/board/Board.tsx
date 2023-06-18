@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+import { Space } from 'antd';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -309,63 +309,56 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         isDropDisabled={!dragging}
       >
         {({ innerRef, droppableProps, placeholder }) => (
-          <Row
+          <Space
             ref={innerRef}
             {...droppableProps}
-            justify='center'
-            wrap={false}
-            style={{ width: '100%', height: '100%', background: 'green' }}
+            style={{ background: 'green', height: '100%', overflowX: 'auto' }}
+            align='start'
+            size='large'
           >
-            <Col style={{ minWidth: '250px' }}>
-              <BoardColumn
-                onTaskCreated={handleTaskCreated}
-                onTaskDeleted={handleTaskDeleted}
-                onColumnDeleted={handleColumnDeleted}
-                tasks={backlog}
-                index={0}
-                id={BACKLOG_ID}
-                title='Backlog'
-              />
-            </Col>
-            <Col style={{ background: 'red' }}>
-              <Row wrap={false} style={{ height: '100%' }}>
-                {board.columns
-                  .sort((a, b) => a.position - b.position)
-                  .map(column => (
-                    <Draggable
+            <BoardColumn
+              onTaskCreated={handleTaskCreated}
+              onTaskDeleted={handleTaskDeleted}
+              onColumnDeleted={handleColumnDeleted}
+              tasks={backlog}
+              index={0}
+              id={BACKLOG_ID}
+              title='Backlog'
+            />
+
+            {board.columns
+              .sort((a, b) => a.position - b.position)
+              .map(column => (
+                <Draggable
+                  key={column.id}
+                  draggableId={`column:${column.id}`}
+                  index={column.position}
+                  isDragDisabled={dragging}
+                >
+                  {(provided, snapshot) => (
+                    <div
                       key={column.id}
-                      draggableId={`column:${column.id}`}
-                      index={column.position}
-                      isDragDisabled={dragging}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{ width: '272px' }}
                     >
-                      {(provided, snapshot) => (
-                        <Col
-                          key={column.id}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{ width: '250px', padding: '8px' }}
-                        >
-                          <BoardColumn
-                            onTaskCreated={handleTaskCreated}
-                            onTaskDeleted={handleTaskDeleted}
-                            onColumnDeleted={handleColumnDeleted}
-                            tasks={column.tasks}
-                            index={column.position}
-                            id={column.id}
-                            title={column.title}
-                          />
-                        </Col>
-                      )}
-                    </Draggable>
-                  ))}
-              </Row>
-            </Col>
+                      <BoardColumn
+                        onTaskCreated={handleTaskCreated}
+                        onTaskDeleted={handleTaskDeleted}
+                        onColumnDeleted={handleColumnDeleted}
+                        tasks={column.tasks}
+                        index={column.position}
+                        id={column.id}
+                        title={column.title}
+                      />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
             {placeholder}
-            <Col style={{ minWidth: '250px' }}>
-              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add column' />
-            </Col>
-          </Row>
+            <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add column' />
+          </Space>
         )}
       </StrictModeDroppable>
     </DragDropContext>
