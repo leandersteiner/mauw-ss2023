@@ -7,7 +7,7 @@ export type TaskResponse = Task;
 export type TaskStateResponse = TaskState;
 export type BacklogTasksResponse = Task[];
 
-export type CreateTaskRequest = { columnId?: string; data: Partial<Task> };
+export type CreateTaskRequest = { columnId: string | null; data: Partial<Task> };
 export type CreateTaskStateRequest = Partial<TaskState>;
 
 export const createTask =
@@ -26,6 +26,12 @@ export const createTask =
 export const updateTask = (projectId: string) => (data: Task) =>
   api
     .patch<BoardResponse>(`/projects/${projectId}/tasks/${data.id}`, data)
+    .then(res => res.data)
+    .catch(reason => reason);
+
+export const deleteTask = (projectId: string) => (taskId: string) =>
+  api
+    .delete<void>(`/projects/${projectId}/tasks/${taskId}`)
     .then(res => res.data)
     .catch(reason => reason);
 

@@ -11,6 +11,7 @@ import {
   CreateTaskRequest,
   createTaskState,
   CreateTaskStateRequest,
+  deleteTask,
   TaskResponse,
   TaskStateResponse,
   updateTask
@@ -22,9 +23,11 @@ import {
   BoardColumnResponse,
   createBoardColumn,
   CreateBoardColumnRequest,
+  deleteBoardColumn,
   updateBoardColumn,
   UpdateBoardColumnRequest
 } from '../../api/boardApi';
+import { User } from '../../models/user/User';
 
 const BACKLOG_ID = 'backlog';
 
@@ -34,13 +37,15 @@ type BoardProps = {
   projectId: string;
   board: BoardModel;
   backlog: Task[];
+  user: User;
 };
 
-export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
+export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps) => {
   const queryClient = useQueryClient();
   const [board, setBoard] = useState<BoardModel>(model);
   const [backlog, setBacklog] = useState<Task[]>(b);
   const [dragging, setDragging] = useState(false);
+
   const updateTaskMutation = useMutation<TaskResponse, Error, Task>({
     mutationFn: updateTask(projectId),
     onSuccess: () => queryClient.invalidateQueries(['board'])
@@ -57,9 +62,16 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
     mutationFn: createTaskState(projectId),
     onSuccess: () => queryClient.invalidateQueries(['board'])
   });
-
   const createTaskMutation = useMutation<TaskResponse, Error, CreateTaskRequest>({
     mutationFn: createTask(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
+  });
+  const deleteTaskMutation = useMutation<void, Error, string>({
+    mutationFn: deleteTask(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board', 'backlog'])
+  });
+  const deleteColumnMutation = useMutation<void, Error, string>({
+    mutationFn: deleteBoardColumn(projectId),
     onSuccess: () => queryClient.invalidateQueries(['board'])
   });
 
@@ -91,8 +103,11 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
         );
         oldColumn.tasks = newSource;
         movedTask.boardColumnId = null;
+        movedTask.taskStateId = null;
         setBacklog([...newDestination]);
         setBoard({ ...board });
+        oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+        backlog.forEach(task => updateTaskMutation.mutate(task));
       }
     } else if (fromBacklog) {
       const movedTask = backlog.find(task => task.id === taskId);
@@ -147,7 +162,6 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
       }
     }
   };
-
   const handleColumnMoved = (id: string, index: number) => {
     const column = board.columns.find(column => column.id === id);
     if (!column) return;
@@ -157,12 +171,10 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
       updateColumnMutation.mutate({ columnId: column.id, data: column })
     );
   };
-
   const handleDragStart = () => {
     setDragging(true);
   };
-
-  const handleColumnAdded = (title: string) => {
+  const handleColumnCreated = (title: string) => {
     createTaskStateMutation.mutate(
       {
         name: title,
@@ -189,23 +201,66 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
       }
     );
   };
-
-  const handleTaskAdded = (task: Task, columnId?: string) => {
-    const column = board.columns.find(column => column.id === columnId);
-    const newTask = { ...task };
-    newTask.position = column ? column.tasks.length + 1 : backlog.length + 1;
-    createTaskMutation.mutate(
-      { columnId, data: task },
-      {
-        onSuccess: task => {
-          if (columnId) {
-            if (column) column.tasks.push(task);
-          } else {
-            backlog.push(task);
+  const handleTaskCreated = (title: string, columnId: string) => {
+    const inBacklog = columnId === BACKLOG_ID;
+    if (inBacklog) {
+      const newTask: Partial<Task> = {
+        boardColumnId: null,
+        name: title,
+        description: '',
+        projectId,
+        creatorId: user.id,
+        done: false,
+        position: backlog.length + 1
+      };
+      createTaskMutation.mutate(
+        { columnId: null, data: newTask },
+        {
+          onSuccess: task => {
+            setBacklog([...backlog, task]);
           }
         }
-      }
-    );
+      );
+    } else {
+      const column = board.columns.find(column => column.id === columnId);
+      if (!column) return;
+      const newTask: Partial<Task> = {
+        boardColumnId: columnId,
+        name: title,
+        description: '',
+        projectId,
+        creatorId: user.id,
+        done: false,
+        position: backlog.length + 1,
+        taskStateId: column.taskStateId
+      };
+      createTaskMutation.mutate(
+        { columnId, data: newTask },
+        {
+          onSuccess: task => {
+            column.tasks.push(task);
+            setBoard({ ...board });
+          }
+        }
+      );
+    }
+  };
+  const handleTaskDeleted = (taskId: string, columnId: string) => {
+    const inBacklog = columnId === BACKLOG_ID;
+
+    if (inBacklog) {
+      const deletedTask = backlog.find(task => task.id === taskId);
+      if (!deletedTask) return;
+      setBacklog([...backlog.filter(task => task.id !== taskId)]);
+      deleteTaskMutation.mutate(taskId);
+    }
+  };
+  const handleColumnDeleted = (columnId: string) => {
+    const deletedColumn = board.columns.find(column => column.id === columnId);
+    if (!deletedColumn) return;
+    board.columns = board.columns.filter(column => column.id !== columnId);
+    setBoard({ ...board });
+    deleteColumnMutation.mutate(columnId);
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -244,7 +299,9 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
           <Row style={{ height: '100%' }} ref={innerRef} {...droppableProps} data-drag-scroller>
             <Col key='board-backlog' flex='auto' style={{ height: '100%' }}>
               <BoardColumn
-                onTaskCreated={(task, columnId) => console.log(task, columnId)}
+                onTaskCreated={handleTaskCreated}
+                onTaskDeleted={handleTaskDeleted}
+                onColumnDeleted={handleColumnDeleted}
                 tasks={backlog}
                 index={0}
                 id={BACKLOG_ID}
@@ -270,7 +327,9 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
                       {...provided.dragHandleProps}
                     >
                       <BoardColumn
-                        onTaskCreated={(task, columnId) => console.log(task, columnId)}
+                        onTaskCreated={handleTaskCreated}
+                        onTaskDeleted={handleTaskDeleted}
+                        onColumnDeleted={handleColumnDeleted}
                         tasks={column.tasks}
                         index={column.position}
                         id={column.id}
@@ -282,10 +341,7 @@ export const Board = ({ projectId, board: model, backlog: b }: BoardProps) => {
               ))}
             {placeholder}
             <Col flex='auto'>
-              <AddNewItem
-                onAdd={text => handleColumnAdded(text)}
-                toggleButtonText='+ Add another column'
-              />
+              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
             </Col>
           </Row>
         )}

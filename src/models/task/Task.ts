@@ -6,8 +6,9 @@ export interface Task {
   priority: number;
   position: number;
   assigneeId: string;
-  stateId: string;
+  taskStateId: string | null;
   sprintId: string;
+  projectId: string;
   boardColumnId: string | null;
   creatorId: string;
 }

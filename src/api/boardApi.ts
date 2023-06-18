@@ -28,6 +28,12 @@ export const updateBoardColumn =
       .then(res => res.data)
       .catch(reason => reason);
 
+export const deleteBoardColumn = (projectId: string) => (columnId: string) =>
+  api
+    .delete<void>(`/projects/${projectId}/board/columns/${columnId}`)
+    .then(res => res.data)
+    .catch(reason => reason);
+
 export const createBoardColumn = (projectId: string) => (data: CreateBoardColumnRequest) =>
   api
     .post<BoardColumn>(`/projects/${projectId}/board/columns/`, data)

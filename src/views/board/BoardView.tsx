@@ -45,5 +45,7 @@ export const BoardView = () => {
     );
   }
 
-  return <Board projectId={projectId} board={boardQuery.data} backlog={backlogQuery.data} />;
+  return (
+    <Board projectId={projectId} board={boardQuery.data} backlog={backlogQuery.data} user={user} />
+  );
 };
