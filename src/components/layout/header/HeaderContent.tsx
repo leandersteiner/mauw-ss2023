@@ -1,8 +1,8 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React from 'react';
-import { usePathContext } from '../../context/PathContext';
-import { useAuth } from '../../context/AuthContext';
+import { usePathContext } from '../../../context/PathContext';
+import { UserAvatar } from './UserAvatar';
 
 type HeaderContentProps = {
   isMenuFolded: boolean;
@@ -11,7 +11,6 @@ type HeaderContentProps = {
 
 export const HeaderContent: React.FC<HeaderContentProps> = (props: HeaderContentProps) => {
   const { path } = usePathContext();
-  const { user } = useAuth();
 
   return (
     <div
@@ -22,12 +21,15 @@ export const HeaderContent: React.FC<HeaderContentProps> = (props: HeaderContent
         padding: '0 8px'
       }}
     >
-      <Button
-        icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
-      />
-      <span>{path}</span>
-      <span>{user?.username}</span>
+      <div>
+        <Button
+          style={{ marginRight: '8px' }}
+          icon={props.isMenuFolded ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={() => props.setIsMenuFolded(!props.isMenuFolded)}
+        />
+        {path}
+      </div>
+      <UserAvatar />
     </div>
   );
 };
