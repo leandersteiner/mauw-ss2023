@@ -310,7 +310,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
       >
         {({ innerRef, droppableProps, placeholder }) => (
           <Space
-            style={{ background: 'green', height: '100%', overflowX: 'hidden' }}
+            style={{ height: '100%', overflowX: 'hidden' }}
             ref={innerRef}
             align='start'
             {...droppableProps}
