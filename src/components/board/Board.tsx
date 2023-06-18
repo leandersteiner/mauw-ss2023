@@ -37,7 +37,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
   });
 
   const handleCardMoved = (cardId: string, columnId: string, index: number) => {
-    let oldColumn = board.columns.find(col => {
+    const oldColumn = board.columns.find(col => {
       return !!col.tasks.find(task => task.id === cardId);
     });
     if (!oldColumn) return;
@@ -45,11 +45,19 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
     if (!newColumn) return;
     const task = oldColumn.tasks.find(task => task.id === cardId);
     if (!task) return;
-    task.boardColumnId = columnId;
-    oldColumn = moveTaskBetweenColumns(oldColumn, newColumn, task);
-    setBoard({ ...board });
-    oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
-    newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+    if (oldColumn.id === newColumn.id) {
+      moveInList(oldColumn.tasks, task.position, index);
+      setBoard({ ...board });
+      board.columns.forEach(column =>
+        updateColumnMutation.mutate({ columnId: column.id, data: column })
+      );
+    } else {
+      task.boardColumnId = columnId;
+      moveTaskBetweenColumns(oldColumn, newColumn, task, index);
+      setBoard({ ...board });
+      oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+      newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+    }
   };
 
   const handleListMoved = (id: string, index: number) => {

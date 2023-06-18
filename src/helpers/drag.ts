@@ -18,17 +18,23 @@ export const reorder = <T extends DragItem>(list: T[]): T[] => {
 export const moveTaskBetweenColumns = (
   source: BoardColumn,
   destination: BoardColumn,
-  item: Task
-): BoardColumn => {
+  item: Task,
+  index: number
+): void => {
   if (source.id !== destination.id) {
     source.tasks = removeItemById(source.tasks, item.id);
   }
+
+  item.position = index;
+
+  destination.tasks.forEach(task => {
+    if (task.position >= index) task.position += 1;
+  });
 
   destination.tasks.push(item);
 
   reorder(source.tasks);
   reorder(destination.tasks);
-  return source;
 };
 
 export const moveInList = <T extends DragItem>(
