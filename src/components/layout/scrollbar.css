@@ -3,6 +3,7 @@
 }
 
 .scrollbar::-webkit-scrollbar {
+    -webkit-appearance: none;
     width: 3px;
     height: 6px;
     background-color: black;

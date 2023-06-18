@@ -37,7 +37,7 @@ export const BoardColumn = ({
                 <BoardColumnTask
                   id={task.id}
                   columnId={id}
-                  title={task.name}
+                  task={task}
                   onTaskDeleted={onTaskDeleted}
                 />
               </div>
