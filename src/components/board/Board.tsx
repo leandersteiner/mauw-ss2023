@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+import { Space } from 'antd';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -18,7 +18,7 @@ import {
 } from '../../api/taskApi';
 import { Task } from '../../models/task/Task';
 import { Board as BoardModel } from '../../models/board/Board';
-import { moveInList, moveTaskBetweenColumns } from '../../helpers/drag';
+import { moveInList, moveTaskBetweenColumns, reorder } from '../../helpers/drag';
 import {
   BoardColumnResponse,
   createBoardColumn,
@@ -231,7 +231,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         projectId,
         creatorId: user.id,
         done: false,
-        position: backlog.length + 1,
+        position: column.tasks.length + 1,
         taskStateId: column.taskStateId
       };
       createTaskMutation.mutate(
@@ -251,8 +251,21 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
     if (inBacklog) {
       const deletedTask = backlog.find(task => task.id === taskId);
       if (!deletedTask) return;
-      setBacklog([...backlog.filter(task => task.id !== taskId)]);
+      setBacklog([...reorder(backlog.filter(task => task.id !== taskId))]);
       deleteTaskMutation.mutate(taskId);
+      backlog.forEach(task => updateTaskMutation.mutate(task));
+    } else {
+      const column = board.columns.find(column => column.id === columnId);
+      if (!column) return;
+      const deletedTask = column.tasks.find(task => task.id === taskId);
+      if (!deletedTask) return;
+      const newTasks = column.tasks.filter(task => task.id !== deletedTask.id);
+      column.tasks = reorder(newTasks);
+      setBoard({ ...board });
+      deleteTaskMutation.mutate(deletedTask.id);
+      board.columns
+        .find(column => column.id === columnId)
+        ?.tasks.forEach(task => updateTaskMutation.mutate(task));
     }
   };
   const handleColumnDeleted = (columnId: string) => {
@@ -296,18 +309,22 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         isDropDisabled={!dragging}
       >
         {({ innerRef, droppableProps, placeholder }) => (
-          <Row style={{ height: '100%' }} ref={innerRef} {...droppableProps} data-drag-scroller>
-            <Col key='board-backlog' flex='auto' style={{ height: '100%' }}>
-              <BoardColumn
-                onTaskCreated={handleTaskCreated}
-                onTaskDeleted={handleTaskDeleted}
-                onColumnDeleted={handleColumnDeleted}
-                tasks={backlog}
-                index={0}
-                id={BACKLOG_ID}
-                title='Backlog'
-              />
-            </Col>
+          <Space
+            style={{ background: 'green', height: '100%', overflowX: 'hidden' }}
+            ref={innerRef}
+            align='start'
+            {...droppableProps}
+            size='middle'
+          >
+            <BoardColumn
+              onTaskCreated={handleTaskCreated}
+              onTaskDeleted={handleTaskDeleted}
+              onColumnDeleted={handleColumnDeleted}
+              tasks={backlog}
+              index={0}
+              id={BACKLOG_ID}
+              title='Backlog'
+            />
             {board.columns
               .sort((a, b) => a.position - b.position)
               .map(column => (
@@ -318,10 +335,9 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                   isDragDisabled={dragging}
                 >
                   {(provided, snapshot) => (
-                    <Col
+                    <div
                       key={column.id}
-                      flex='auto'
-                      style={{ height: '100%' }}
+                      style={{ width: '272px' }}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -335,15 +351,13 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                         id={column.id}
                         title={column.title}
                       />
-                    </Col>
+                    </div>
                   )}
                 </Draggable>
               ))}
             {placeholder}
-            <Col flex='auto'>
-              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
-            </Col>
-          </Row>
+            <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
+          </Space>
         )}
       </StrictModeDroppable>
     </DragDropContext>

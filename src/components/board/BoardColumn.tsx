@@ -1,6 +1,6 @@
 import './scrollbar.css';
 import { Draggable } from 'react-beautiful-dnd';
-import { Button, Col, Row, Tooltip } from 'antd';
+import { Button, Col, Row, Space, Tooltip } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
@@ -27,19 +27,26 @@ export const BoardColumn = ({
   onTaskDeleted,
   onColumnDeleted
 }: BoardColumnProps) => {
-  const tasksNode = tasks
-    .sort((a, b) => a.position - b.position)
-    .map(task => (
-      <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
-        {({ innerRef, draggableProps, dragHandleProps }) => (
-          <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
-            <div key={task.id} style={{ paddingBottom: '5px' }}>
-              <BoardColumnTask id={task.id} title={task.name} />
-            </div>
-          </div>
-        )}
-      </Draggable>
-    ));
+  const tasksNode = (
+    <Space direction='vertical' style={{ width: '100%' }}>
+      {tasks
+        .sort((a, b) => a.position - b.position)
+        .map(task => (
+          <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
+            {({ innerRef, draggableProps, dragHandleProps }) => (
+              <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
+                <BoardColumnTask
+                  id={task.id}
+                  columnId={id}
+                  title={task.name}
+                  onTaskDeleted={onTaskDeleted}
+                />
+              </div>
+            )}
+          </Draggable>
+        ))}
+    </Space>
+  );
 
   return (
     <StrictModeDroppable
@@ -48,7 +55,12 @@ export const BoardColumn = ({
       direction='vertical'
     >
       {({ innerRef, droppableProps, placeholder }) => (
-        <div {...droppableProps} ref={innerRef} style={{ height: '100%', padding: '0px 8px' }}>
+        <Space
+          {...droppableProps}
+          ref={innerRef}
+          direction='vertical'
+          style={{ width: '272px', height: '100%' }}
+        >
           <Row justify='space-between' align='middle'>
             <Col>
               <h1>{title}</h1>
@@ -65,7 +77,7 @@ export const BoardColumn = ({
               </Tooltip>
             </Col>
           </Row>
-          <div style={{ maxHeight: '95%', overflowY: 'auto' }} className='scrollbar'>
+          <div style={{ overflowY: 'hidden' }} className='scrollbar'>
             {tasksNode}
             {placeholder}
           </div>
@@ -73,7 +85,7 @@ export const BoardColumn = ({
             onAdd={text => onTaskCreated(text, id)}
             toggleButtonText='+ Add another Task'
           />
-        </div>
+        </Space>
       )}
     </StrictModeDroppable>
   );
