@@ -6,6 +6,7 @@ export type BoardResponse = Board;
 export type BoardColumnResponse = BoardColumn;
 
 export type UpdateBoardColumnRequest = { columnId: string; data: BoardColumn };
+export type CreateBoardColumnRequest = Partial<BoardColumn>;
 
 export const getBoard = (projectId: string) =>
   api
@@ -26,3 +27,9 @@ export const updateBoardColumn =
       .patch<BoardColumn>(`/projects/${projectId}/board/columns/${columnId}`, data)
       .then(res => res.data)
       .catch(reason => reason);
+
+export const createBoardColumn = (projectId: string) => (data: CreateBoardColumnRequest) =>
+  api
+    .post<BoardColumn>(`/projects/${projectId}/board/columns/`, data)
+    .then(res => res.data)
+    .catch(reason => reason);

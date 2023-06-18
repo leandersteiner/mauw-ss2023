@@ -6,12 +6,20 @@ import { BoardColumn } from './BoardColumn';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { AddNewItem } from './AddNewItem';
-import { TaskResponse, updateTask } from '../../api/taskApi';
+import {
+  createTaskState,
+  CreateTaskStateRequest,
+  TaskResponse,
+  TaskStateResponse,
+  updateTask
+} from '../../api/taskApi';
 import { Task } from '../../models/task/Task';
 import { Board as BoardModel } from '../../models/board/Board';
 import { moveInList, moveTaskBetweenColumns } from '../../helpers/drag';
 import {
   BoardColumnResponse,
+  createBoardColumn,
+  CreateBoardColumnRequest,
   updateBoardColumn,
   UpdateBoardColumnRequest
 } from '../../api/boardApi';
@@ -33,6 +41,14 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
   });
   const updateColumnMutation = useMutation<BoardColumnResponse, Error, UpdateBoardColumnRequest>({
     mutationFn: updateBoardColumn(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
+  });
+  const createColumnMutation = useMutation<BoardColumnResponse, Error, CreateBoardColumnRequest>({
+    mutationFn: createBoardColumn(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
+  });
+  const createTaskStateMutation = useMutation<TaskStateResponse, Error, CreateTaskStateRequest>({
+    mutationFn: createTaskState(projectId),
     onSuccess: () => queryClient.invalidateQueries(['board'])
   });
 
@@ -60,7 +76,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
     }
   };
 
-  const handleListMoved = (id: string, index: number) => {
+  const handleColumnMoved = (id: string, index: number) => {
     const column = board.columns.find(column => column.id === id);
     if (!column) return;
     moveInList(board.columns, column.position, index);
@@ -72,6 +88,36 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
 
   const handleDragStart = () => {
     setDragging(true);
+  };
+
+  const handleColumnAdded = (title: string) => {
+    const taskState = createTaskStateMutation.mutate(
+      {
+        name: title,
+        projectId
+      },
+      {
+        onSuccess: taskState => {
+          createColumnMutation.mutate(
+            {
+              title,
+              position: board.columns.length + 1,
+              taskStateId: taskState.id,
+              state: taskState
+            },
+            {
+              onSuccess: column => {
+                column.tasks = column.tasks ?? [];
+                board.columns.push(column);
+                setBoard({ ...board });
+              },
+              onError: error => console.log(error)
+            }
+          );
+        },
+        onError: error => console.log(error)
+      }
+    );
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -88,7 +134,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
 
     switch (type) {
       case DroppableTypes.COLUMN:
-        handleListMoved(id, destination.index);
+        handleColumnMoved(id, destination.index);
         break;
       case DroppableTypes.CARD:
         handleCardMoved(id, parseDndId(destination.droppableId), destination.index);
@@ -149,9 +195,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
             {placeholder}
             <Col flex='auto'>
               <AddNewItem
-                onAdd={text => {
-                  console.log(text);
-                }}
+                onAdd={text => handleColumnAdded(text)}
                 toggleButtonText='+ Add another column'
               />
             </Col>
