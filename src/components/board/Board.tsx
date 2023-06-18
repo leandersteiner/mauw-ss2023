@@ -310,7 +310,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
       >
         {({ innerRef, droppableProps, placeholder }) => (
           <Space
-            style={{ height: '100%', overflowX: 'hidden' }}
+            style={{ height: '100%' }}
             ref={innerRef}
             align='start'
             {...droppableProps}
@@ -356,7 +356,9 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                 </Draggable>
               ))}
             {placeholder}
-            <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
+            <div style={{ width: '200px' }}>
+              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
+            </div>
           </Space>
         )}
       </StrictModeDroppable>

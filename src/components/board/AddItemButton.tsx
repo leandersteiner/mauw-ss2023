@@ -17,7 +17,7 @@ export const AddItemButton = styled.button`
 `;
 
 export const NewItemFormContainer = styled.div`
-  max-width: 300px;
+  max-width: 272px;
   display: flex;
   flex-direction: column;
   width: 100%;
