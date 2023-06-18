@@ -15,7 +15,7 @@ export const appStateReducer = (state: AppState, action: Action): void => {
     case Actions.ADD_TASK: {
       const targetColumn = findItemIndexById(
         state.projectBoard.columns,
-        action.payload.boardColumnId
+        action.payload.boardColumnId ?? ''
       );
       state.projectBoard.columns[targetColumn].tasks.push(action.payload);
       break;

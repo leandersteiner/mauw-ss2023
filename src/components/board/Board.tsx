@@ -18,7 +18,7 @@ import {
 } from '../../api/taskApi';
 import { Task } from '../../models/task/Task';
 import { Board as BoardModel } from '../../models/board/Board';
-import { moveInList, moveTaskBetweenColumns } from '../../helpers/drag';
+import { moveInList, moveTaskBetweenColumns, reorder } from '../../helpers/drag';
 import {
   BoardColumnResponse,
   createBoardColumn,
@@ -231,7 +231,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         projectId,
         creatorId: user.id,
         done: false,
-        position: backlog.length + 1,
+        position: column.tasks.length + 1,
         taskStateId: column.taskStateId
       };
       createTaskMutation.mutate(
@@ -251,8 +251,21 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
     if (inBacklog) {
       const deletedTask = backlog.find(task => task.id === taskId);
       if (!deletedTask) return;
-      setBacklog([...backlog.filter(task => task.id !== taskId)]);
+      setBacklog([...reorder(backlog.filter(task => task.id !== taskId))]);
       deleteTaskMutation.mutate(taskId);
+      backlog.forEach(task => updateTaskMutation.mutate(task));
+    } else {
+      const column = board.columns.find(column => column.id === columnId);
+      if (!column) return;
+      const deletedTask = column.tasks.find(task => task.id === taskId);
+      if (!deletedTask) return;
+      const newTasks = column.tasks.filter(task => task.id !== deletedTask.id);
+      column.tasks = reorder(newTasks);
+      setBoard({ ...board });
+      deleteTaskMutation.mutate(deletedTask.id);
+      board.columns
+        .find(column => column.id === columnId)
+        ?.tasks.forEach(task => updateTaskMutation.mutate(task));
     }
   };
   const handleColumnDeleted = (columnId: string) => {
@@ -296,8 +309,14 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         isDropDisabled={!dragging}
       >
         {({ innerRef, droppableProps, placeholder }) => (
-          <Row style={{ height: '100%' }} ref={innerRef} {...droppableProps} data-drag-scroller>
-            <Col key='board-backlog' flex='auto' style={{ height: '100%' }}>
+          <Row
+            ref={innerRef}
+            {...droppableProps}
+            justify='center'
+            wrap={false}
+            style={{ width: '100%', height: '100%', background: 'green' }}
+          >
+            <Col style={{ minWidth: '250px' }}>
               <BoardColumn
                 onTaskCreated={handleTaskCreated}
                 onTaskDeleted={handleTaskDeleted}
@@ -308,40 +327,43 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                 title='Backlog'
               />
             </Col>
-            {board.columns
-              .sort((a, b) => a.position - b.position)
-              .map(column => (
-                <Draggable
-                  key={column.id}
-                  draggableId={`column:${column.id}`}
-                  index={column.position}
-                  isDragDisabled={dragging}
-                >
-                  {(provided, snapshot) => (
-                    <Col
+            <Col style={{ background: 'red' }}>
+              <Row wrap={false} style={{ height: '100%' }}>
+                {board.columns
+                  .sort((a, b) => a.position - b.position)
+                  .map(column => (
+                    <Draggable
                       key={column.id}
-                      flex='auto'
-                      style={{ height: '100%' }}
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
+                      draggableId={`column:${column.id}`}
+                      index={column.position}
+                      isDragDisabled={dragging}
                     >
-                      <BoardColumn
-                        onTaskCreated={handleTaskCreated}
-                        onTaskDeleted={handleTaskDeleted}
-                        onColumnDeleted={handleColumnDeleted}
-                        tasks={column.tasks}
-                        index={column.position}
-                        id={column.id}
-                        title={column.title}
-                      />
-                    </Col>
-                  )}
-                </Draggable>
-              ))}
+                      {(provided, snapshot) => (
+                        <Col
+                          key={column.id}
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{ width: '250px', padding: '8px' }}
+                        >
+                          <BoardColumn
+                            onTaskCreated={handleTaskCreated}
+                            onTaskDeleted={handleTaskDeleted}
+                            onColumnDeleted={handleColumnDeleted}
+                            tasks={column.tasks}
+                            index={column.position}
+                            id={column.id}
+                            title={column.title}
+                          />
+                        </Col>
+                      )}
+                    </Draggable>
+                  ))}
+              </Row>
+            </Col>
             {placeholder}
-            <Col flex='auto'>
-              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
+            <Col style={{ minWidth: '250px' }}>
+              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add column' />
             </Col>
           </Row>
         )}

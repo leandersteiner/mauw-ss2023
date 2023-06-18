@@ -49,8 +49,6 @@ export const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path='settings' element={<DatePicker />} />
-              <Route path='create-project' element={<DatePicker />} />
             </Route>
             <Route path='/orgs/:orgId/teams/:teamId/projects/:projectId' element={<Overview />}>
               <Route path='board' element={<BoardView />} />

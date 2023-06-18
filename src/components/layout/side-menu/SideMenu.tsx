@@ -1,15 +1,15 @@
 import { Menu } from 'antd';
-import { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useAuth } from '../../../context/AuthContext';
 import {
-  MenuItem,
   createLoggedInBottomSideMenuEntries,
   createLoggedInTopSideMenuEntries,
   createLoggedOutBottomSideMenuEntries,
-  createLoggedOutTopSideMenuEntries
+  createLoggedOutTopSideMenuEntries,
+  MenuItem
 } from './SideMenuEntries';
 import { usePathContext } from '../../../context/PathContext';
 import { getProjects } from '../../../api/projectsApi';
@@ -20,7 +20,7 @@ const menuWrapperStyle: CSSProperties = {
   height: '100%'
 };
 
-const menuContatinerStyle: CSSProperties = {
+const menuContainerStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: 'column',
@@ -74,7 +74,7 @@ export const SideMenu: React.FC = () => {
   return (
     <div style={menuWrapperStyle}>
       <div style={logo} />
-      <div style={menuContatinerStyle}>
+      <div style={menuContainerStyle}>
         <div>
           <Menu
             theme='dark'

@@ -20,9 +20,9 @@ export const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLay
   };
 
   const contentStyle: CSSProperties = {
-    margin: '24px 16px',
+    margin: '8px',
     padding: 24,
-    overflowY: 'auto',
+    overflowY: 'hidden',
     height: '100%'
   };
 

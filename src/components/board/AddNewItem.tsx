@@ -15,7 +15,10 @@ export const AddNewItem = (props: AddNewItemProps) => {
     return (
       <NewItemForm
         onAdd={text => {
-          onAdd(text);
+          if (text !== '') {
+            onAdd(text);
+            setShowForm(false);
+          }
           setShowForm(false);
         }}
       />
