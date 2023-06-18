@@ -91,7 +91,7 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
   };
 
   const handleColumnAdded = (title: string) => {
-    const taskState = createTaskStateMutation.mutate(
+    createTaskStateMutation.mutate(
       {
         name: title,
         projectId
@@ -110,12 +110,10 @@ export const Board = ({ projectId, board: model }: BoardProps) => {
                 column.tasks = column.tasks ?? [];
                 board.columns.push(column);
                 setBoard({ ...board });
-              },
-              onError: error => console.log(error)
+              }
             }
           );
-        },
-        onError: error => console.log(error)
+        }
       }
     );
   };
