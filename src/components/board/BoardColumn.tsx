@@ -1,4 +1,3 @@
-import './scrollbar.css';
 import { Draggable } from 'react-beautiful-dnd';
 import { Button, Col, Row, Space, Tooltip } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
@@ -59,7 +58,9 @@ export const BoardColumn = ({
           {...droppableProps}
           ref={innerRef}
           direction='vertical'
-          style={{ width: '272px', height: '100%' }}
+          style={{
+            width: '272px'
+          }}
         >
           <Row justify='space-between' align='middle'>
             <Col>
@@ -77,7 +78,7 @@ export const BoardColumn = ({
               </Tooltip>
             </Col>
           </Row>
-          <div style={{ overflowY: 'hidden' }} className='scrollbar'>
+          <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 250px)' }} className='scrollbar'>
             {tasksNode}
             {placeholder}
           </div>

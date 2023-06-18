@@ -21,8 +21,7 @@ export const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLay
   };
 
   const contentStyle: CSSProperties = {
-    margin: '8px',
-    padding: 24,
+    padding: '24px 36px',
     overflowY: 'auto',
     height: '100%'
   };

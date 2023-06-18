@@ -25,6 +25,7 @@ export const NewItemFormContainer = styled.div`
 `;
 
 export const NewItemButton = styled.button`
+  height: 35px;
   background-color: #5aac44;
   border-radius: 3px;
   border: none;
@@ -35,6 +36,7 @@ export const NewItemButton = styled.button`
 `;
 
 export const NewItemInput = styled.input`
+  height: 35px;
   border-radius: 3px;
   border: none;
   box-shadow: #091e4240 0px 1px 0px 0px;
