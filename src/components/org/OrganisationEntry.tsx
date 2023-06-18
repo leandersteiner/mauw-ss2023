@@ -1,8 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
+import Title from 'antd/es/typography/Title';
+import { Collapse } from 'antd';
 import { Organisation } from '../../models/organisation/Organisation';
 import { Team } from '../../models/team/Team';
 import { getTeamOrgs } from '../../api/teamApi';
+import { TeamEntry } from './TeamEntry';
 
 type OrganisationEntryProps = {
   org: Organisation;
@@ -11,6 +14,8 @@ type OrganisationEntryProps = {
 export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   props: OrganisationEntryProps
 ) => {
+  const [isHover, setIsHover] = useState(false);
+
   const [teams, setTeams] = useState<Team[]>([]);
 
   const { isLoading, isError, error, data, refetch } = useQuery<Team[], Error>({
@@ -29,5 +34,57 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
     refetch();
   };
 
-  return <div> </div>;
+  const organisationEntryStyle: CSSProperties = {
+    transition: 'box-shadow .3s',
+    backgroundColor: '#ffffff',
+    borderRadius: '5px',
+    padding: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    alignContent: 'flex-start',
+    gap: '10px',
+    boxShadow: isHover
+      ? 'rgba(0, 0, 0, 0.35) 0px 5px 15px'
+      : 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
+    width: '100%'
+  };
+
+  return (
+    <div
+      style={organisationEntryStyle}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+    >
+      <Title
+        style={{ margin: '0', maxWidth: '50%' }}
+        level={4}
+        ellipsis={{ rows: 1, tooltip: true }}
+      >
+        {props.org.name}
+      </Title>
+
+      <Collapse
+        bordered={false}
+        onChange={() => fetchTeams()}
+        style={{ width: '100%', marginTop: '-40px' }}
+        expandIconPosition='end'
+        size='small'
+        items={[
+          {
+            key: '1',
+            label: '',
+            children: (
+              <div>
+                {teams?.map(team => {
+                  return <TeamEntry team={team} key={team.id} />;
+                })}
+              </div>
+            )
+          }
+        ]}
+      />
+    </div>
+  );
 };

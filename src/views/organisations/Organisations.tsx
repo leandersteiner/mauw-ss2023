@@ -13,6 +13,13 @@ const topBarStyle: CSSProperties = {
   marginBottom: '10px'
 };
 
+const orgsWrapperStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'flex-start',
+  flexDirection: 'column',
+  gap: '20px'
+};
+
 export const Organisations = () => {
   const { setPath } = usePathContext();
   useEffect(() => setPath('organisations'), [setPath]);
@@ -35,19 +42,15 @@ export const Organisations = () => {
     <span>
       <div style={topBarStyle}>
         <Button icon={<PlusOutlined />} onClick={() => {}}>
-          Create Project
+          Create Organisation
         </Button>
       </div>
 
-      <Row gutter={[16, 16]}>
+      <div style={orgsWrapperStyle}>
         {orgs?.map(org => {
-          return (
-            <Col xs={24} sm={12} md={8} lg={8} xl={6} key={org.id}>
-              <OrganisationEntry org={org} />
-            </Col>
-          );
+          return <OrganisationEntry org={org} key={org.id} />;
         })}
-      </Row>
+      </div>
     </span>
   );
 };
