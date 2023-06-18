@@ -6,7 +6,7 @@ export const getTeams = () => api.get<Team[]>('teams').then(res => res.data);
 export const getTeamById = (request: { orgId: string; teamId: string }) =>
   api.get<Team[]>(`orgs/${request.orgId}/teams/${request.teamId}`).then(res => res.data);
 
-export const getAllTeamsOfOrg = (orgId: string) =>
+export const getTeamOrgs = (orgId: string) =>
   api.get<Team[]>(`orgs/${orgId}/teams`).then(res => res.data);
 
 export const createTeam = (createTeamRequest: CreateTeamRequest) =>
