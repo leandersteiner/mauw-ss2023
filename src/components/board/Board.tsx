@@ -245,6 +245,9 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
       );
     }
   };
+
+  const handleTaskEdited = (taskId: string, task: Task) => {};
+
   const handleTaskDeleted = (taskId: string, columnId: string) => {
     const inBacklog = columnId === BACKLOG_ID;
 
@@ -320,6 +323,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
               onTaskCreated={handleTaskCreated}
               onTaskDeleted={handleTaskDeleted}
               onColumnDeleted={handleColumnDeleted}
+              onTaskEdited={handleTaskEdited}
               tasks={backlog}
               index={0}
               id={BACKLOG_ID}
@@ -346,6 +350,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                         onTaskCreated={handleTaskCreated}
                         onTaskDeleted={handleTaskDeleted}
                         onColumnDeleted={handleColumnDeleted}
+                        onTaskEdited={handleTaskEdited}
                         tasks={column.tasks}
                         index={column.position}
                         id={column.id}

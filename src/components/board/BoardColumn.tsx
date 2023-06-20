@@ -14,6 +14,7 @@ export type BoardColumnProps = {
   tasks: Task[];
   onTaskCreated: (title: string, columnId: string) => void;
   onTaskDeleted: (taskId: string, columnId: string) => void;
+  onTaskEdited: (taskId: string, task: Task) => void;
   onColumnDeleted: (columnId: string) => void;
 };
 
@@ -24,6 +25,7 @@ export const BoardColumn = ({
   tasks,
   onTaskCreated,
   onTaskDeleted,
+  onTaskEdited,
   onColumnDeleted
 }: BoardColumnProps) => {
   const tasksNode = (
@@ -39,6 +41,7 @@ export const BoardColumn = ({
                   columnId={id}
                   task={task}
                   onTaskDeleted={onTaskDeleted}
+                  onTaskEdited={onTaskEdited}
                 />
               </div>
             )}
