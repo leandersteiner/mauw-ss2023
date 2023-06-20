@@ -1,6 +1,7 @@
 import { Button, message, Popconfirm } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 import { deleteUser } from '../../api/userApi';
 import { User } from '../../models/user/User';
 
@@ -20,14 +21,13 @@ export const DeleteAccountButton = ({ user }: DeleteAccountButtonProps) => {
     }
   };
 
-  const cancel = () => {};
-
   return (
     <Popconfirm
-      title='Delete yout account'
+      title='Delete your account'
       description='Are you sure you want to delete your account?'
+      icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+      okButtonProps={{ danger: true }}
       onConfirm={confirm}
-      onCancel={cancel}
       okText='Yes'
       cancelText='No'
     >
