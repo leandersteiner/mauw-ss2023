@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { CSSProperties, ReactNode, useEffect, useState } from 'react';
+import { DeleteOutlined, UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
-import { Collapse } from 'antd';
+import { Avatar, Button, Collapse, Tooltip } from 'antd';
 import { Organisation } from '../../models/organisation/Organisation';
 import { Team } from '../../models/team/Team';
 import { getTeamOrgs } from '../../api/teamApi';
@@ -49,46 +50,94 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
     backgroundColor: '#ffffff',
     borderRadius: '5px',
     padding: '10px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    alignContent: 'flex-start',
-    gap: '10px',
     boxShadow: isHover
       ? 'rgba(0, 0, 0, 0.35) 0px 5px 15px'
       : 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
+    width: '100%',
+    height: '60px'
+  };
+
+  const organisationEntryContentStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    alignContent: 'center',
+    gap: '30px',
     width: '100%'
   };
 
-  return (
-    <div
-      style={organisationEntryStyle}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
-    >
-      <Title
-        style={{ margin: '0', maxWidth: '50%' }}
-        level={4}
-        ellipsis={{ rows: 1, tooltip: true }}
-      >
-        {props.org.name}
-      </Title>
+  const titleOwnerStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    alignContent: 'center',
+    gap: '30px',
+    width: '90%'
+  };
 
-      <Collapse
-        bordered={false}
-        onChange={() => fetchTeams()}
-        style={{ width: '100%', marginTop: '-40px', backgroundColor: 'transparent' }}
-        expandIconPosition='end'
-        size='small'
-        items={[
-          {
-            key: '1',
-            label: '',
-            children: getTeamEntryItems()
-          }
-        ]}
-      />
-    </div>
+  const userAvatarStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    alignContent: 'center',
+    gap: '10px'
+  };
+
+  const buttonContainerStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignContent: 'flex-end',
+    alignItems: 'center',
+    gap: '10px'
+  };
+
+  return (
+    <Collapse
+      bordered={false}
+      onChange={() => fetchTeams()}
+      style={{
+        width: '100%',
+        backgroundColor: '#ffffff'
+      }}
+      expandIconPosition='end'
+      size='large'
+      items={[
+        {
+          key: '1',
+          label: (
+            <div>
+              <div style={organisationEntryContentStyle}>
+                <div style={titleOwnerStyle}>
+                  <Title style={{ margin: '0' }} level={4} ellipsis={{ rows: 1, tooltip: true }}>
+                    {props.org.name}
+                  </Title>
+
+                  <span style={userAvatarStyle}>
+                    <Avatar size='small' icon={<UserOutlined />} />
+                    <Title style={{ margin: '0' }} level={5} ellipsis={{ rows: 1, tooltip: true }}>
+                      {props.org.owner.username}
+                    </Title>
+                  </span>
+                </div>
+
+                <span style={buttonContainerStyle}>
+                  <Tooltip title='Manage users'>
+                    <Button icon={<UserSwitchOutlined />} onClick={e => e.stopPropagation()} />
+                  </Tooltip>
+
+                  <Tooltip title='Delete'>
+                    <Button danger icon={<DeleteOutlined />} onClick={e => e.stopPropagation()} />
+                  </Tooltip>
+                </span>
+              </div>
+            </div>
+          ),
+          children: getTeamEntryItems()
+        }
+      ]}
+    />
   );
 };
