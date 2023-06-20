@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { CSSProperties, useEffect, useState } from 'react';
+import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import Title from 'antd/es/typography/Title';
 import { Collapse } from 'antd';
 import { Organisation } from '../../models/organisation/Organisation';
@@ -32,6 +32,16 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
 
   const fetchTeams = () => {
     refetch();
+  };
+
+  const getTeamEntryItems = (): ReactNode => {
+    return (
+      <div>
+        {teams?.map(team => {
+          return <TeamEntry team={team} key={team.id} />;
+        })}
+      </div>
+    );
   };
 
   const organisationEntryStyle: CSSProperties = {
@@ -68,20 +78,14 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
       <Collapse
         bordered={false}
         onChange={() => fetchTeams()}
-        style={{ width: '100%', marginTop: '-40px' }}
+        style={{ width: '100%', marginTop: '-40px', backgroundColor: 'transparent' }}
         expandIconPosition='end'
         size='small'
         items={[
           {
             key: '1',
             label: '',
-            children: (
-              <div>
-                {teams?.map(team => {
-                  return <TeamEntry team={team} key={team.id} />;
-                })}
-              </div>
-            )
+            children: getTeamEntryItems()
           }
         ]}
       />

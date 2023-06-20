@@ -6,6 +6,7 @@ import { usePathContext } from '../../context/PathContext';
 import { Organisation } from '../../models/organisation/Organisation';
 import { getOrgs } from '../../api/orgApi';
 import { OrganisationEntry } from '../../components/org/OrganisationEntry';
+import { CreateOrganisationModal } from '../../components/org/CreateOrganisationModal';
 
 const topBarStyle: CSSProperties = {
   display: 'flex',
@@ -25,9 +26,9 @@ export const Organisations = () => {
   useEffect(() => setPath('organisations'), [setPath]);
 
   const [orgs, setOrgs] = useState<Organisation[]>([]);
-  const [isCreateOrgModalOpen, setIsCreateOrgModalOpen] = useState(false);
+  const [isCreateOrganisationModalOpen, setIsCreateOrganisationModalOpen] = useState(false);
 
-  const { isLoading, isError, error, data } = useQuery<Organisation[], Error>({
+  const { isLoading, isError, error, data, refetch } = useQuery<Organisation[], Error>({
     queryKey: ['orgs'],
     queryFn: getOrgs
   });
@@ -40,8 +41,19 @@ export const Organisations = () => {
 
   return (
     <span>
+      <CreateOrganisationModal
+        isCreateOrganisationModalOpen={isCreateOrganisationModalOpen}
+        setIsCreateOrganisationModalOpen={setIsCreateOrganisationModalOpen}
+        refetch={refetch}
+      />
+
       <div style={topBarStyle}>
-        <Button icon={<PlusOutlined />} onClick={() => {}}>
+        <Button
+          icon={<PlusOutlined />}
+          onClick={() => {
+            setIsCreateOrganisationModalOpen(true);
+          }}
+        >
           Create Organisation
         </Button>
       </div>
