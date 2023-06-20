@@ -19,7 +19,7 @@ export const TaskOverview = ({ close, task }: TaskOverviewProps) => {
   return (
     <>
       <Row>
-        <Col>
+        <Col span={24}>
           <Divider type='horizontal' style={{ margin: 10 }} />
           <Title
             editable={{
