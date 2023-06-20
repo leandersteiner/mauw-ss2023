@@ -62,7 +62,7 @@ export const Organisations = () => {
         {orgs?.map(org => {
           return (
             <Col xs={24} sm={24} md={24} lg={12} xl={12} key={org.id}>
-              <OrganisationEntry org={org} key={org.id} />
+              <OrganisationEntry org={org} key={org.id} refetch={refetch} />
             </Col>
           );
         })}

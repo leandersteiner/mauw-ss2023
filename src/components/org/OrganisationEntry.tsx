@@ -1,4 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useQuery
+} from '@tanstack/react-query';
 import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { DeleteOutlined, UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
@@ -7,14 +12,21 @@ import { Organisation } from '../../models/organisation/Organisation';
 import { Team } from '../../models/team/Team';
 import { getTeamOrgs } from '../../api/teamApi';
 import { TeamEntry } from './TeamEntry';
+import { useAuth } from '../../context/AuthContext';
+import { deleteOrg } from '../../api/orgApi';
 
 type OrganisationEntryProps = {
   org: Organisation;
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Organisation[], Error>>;
 };
 
 export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   props: OrganisationEntryProps
 ) => {
+  const { user } = useAuth();
+
   const [isHover, setIsHover] = useState(false);
 
   const [teams, setTeams] = useState<Team[]>([]);
@@ -125,11 +137,30 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
 
                 <span style={buttonContainerStyle}>
                   <Tooltip title='Manage users'>
-                    <Button icon={<UserSwitchOutlined />} onClick={e => e.stopPropagation()} />
+                    <Button
+                      icon={<UserSwitchOutlined />}
+                      onClick={e => e.stopPropagation()}
+                      disabled={!(props.org.owner.username === user?.username)}
+                    />
                   </Tooltip>
 
                   <Tooltip title='Delete'>
-                    <Button danger icon={<DeleteOutlined />} onClick={e => e.stopPropagation()} />
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={e => {
+                        e.stopPropagation();
+                        const response: Promise<number> = deleteOrg(props.org.id);
+                        response
+                          .then(() => {
+                            props.refetch();
+                          })
+                          // eslint-disable-next-line @typescript-eslint/no-shadow
+                          .catch((error: Error) => {
+                            alert(error.message);
+                          });
+                      }}
+                    />
                   </Tooltip>
                 </span>
               </div>
