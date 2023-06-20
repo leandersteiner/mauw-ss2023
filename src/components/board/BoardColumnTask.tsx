@@ -32,7 +32,7 @@ export const BoardColumnTask = ({ id, columnId, task, onTaskDeleted }: BoardColu
     >
       <Space direction='vertical'>
         <h1 style={{ margin: '0', padding: '0' }}>{name}</h1>
-        {subtasks.length > 0 && (
+        {subtasks?.length > 0 && (
           <div>
             <Row>
               <Col>
