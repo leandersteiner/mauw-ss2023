@@ -1,6 +1,7 @@
-import { Card, Col, Popconfirm, Progress, Row, Space, Tooltip } from 'antd';
+import { Card, Popconfirm, Progress, Space, Tooltip } from 'antd';
 import { DeleteOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import Title from 'antd/es/typography/Title';
 import { Task } from '../../models/task/Task';
 import { Subtask } from '../../models/task/Subtask';
 import { TaskOverviewModal } from '../task/TaskOverviewModal';
@@ -9,7 +10,7 @@ type BoardColumnTaskProps = {
   id: string;
   columnId: string;
   task: Task;
-  onTaskDeleted: (taskId: string, columnId: string) => void;
+  onTaskDeleted: (taskId: string, columnId: string | null) => void;
   onTaskEdited: (taskId: string, task: Task) => void;
 };
 
@@ -27,17 +28,18 @@ export const BoardColumnTask = ({
 }: BoardColumnTaskProps) => {
   const { name, subtasks } = task;
   const [isTaskOverviewModalOpen, setIsTaskOverviewModalOpen] = useState(false);
-
   return (
     <>
       <TaskOverviewModal
         isOpen={isTaskOverviewModalOpen}
         close={() => setIsTaskOverviewModalOpen(false)}
         task={task}
+        onTaskEdited={onTaskEdited}
+        onTaskDeleted={onTaskDeleted}
       />
       <Card
         style={{ border: '1px solid #cfcfcf', maxWidth: '100%' }}
-        bodyStyle={{ margin: '0px', padding: '8px', textAlign: 'center' }}
+        bodyStyle={{ margin: '8px', padding: '8px', textAlign: 'left' }}
         actions={[
           <Tooltip key='edit' placement='bottom' title='Edit Task'>
             <EditOutlined onClick={() => setIsTaskOverviewModalOpen(true)} />
@@ -57,26 +59,28 @@ export const BoardColumnTask = ({
           </Tooltip>
         ]}
       >
-        <Space direction='vertical'>
-          <h1 style={{ margin: '0', padding: '0' }}>{name}</h1>
-          {subtasks?.length > 0 && (
-            <div>
-              <Row>
-                <Col>
-                  <Progress
-                    percent={subtaskPercent(subtasks)}
-                    showInfo={false}
-                    status='active'
-                    style={{ width: '100px' }}
-                  />
-                </Col>
-                <Col>
-                  <span>{`${subtasks.filter(subtask => subtask.done).length} / ${
-                    subtasks.length
-                  }`}</span>
-                </Col>
-              </Row>
-            </div>
+        <Space direction='vertical' onClick={() => setIsTaskOverviewModalOpen(true)}>
+          <Title
+            level={5}
+            style={{ margin: '0' }}
+            editable={{
+              onChange: text => {
+                task.name = text;
+              },
+              onEnd: () => onTaskEdited(task.id, task),
+              triggerType: ['text']
+            }}
+          >
+            {name}
+          </Title>
+          {subtasks.length > 0 && (
+            <Progress
+              percent={subtaskPercent(subtasks)}
+              format={() =>
+                `${subtasks.filter(subtask => subtask.done).length} / ${subtasks.length}`
+              }
+              style={{ width: '100%' }}
+            />
           )}
         </Space>
       </Card>

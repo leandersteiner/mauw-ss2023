@@ -1,6 +1,7 @@
 import { Draggable } from 'react-beautiful-dnd';
-import { Button, Col, Row, Space, Tooltip } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { Button, Col, Popconfirm, Row, Space, Tooltip } from 'antd';
+import { DeleteFilled, QuestionCircleOutlined } from '@ant-design/icons';
+import Title from 'antd/es/typography/Title';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { BoardColumnTask } from './BoardColumnTask';
@@ -13,9 +14,10 @@ export type BoardColumnProps = {
   index: number;
   tasks: Task[];
   onTaskCreated: (title: string, columnId: string) => void;
-  onTaskDeleted: (taskId: string, columnId: string) => void;
+  onTaskDeleted: (taskId: string, columnId: string | null) => void;
   onTaskEdited: (taskId: string, task: Task) => void;
   onColumnDeleted: (columnId: string) => void;
+  onColumnRenamed: (columnId: string, newTitle: string) => void;
 };
 
 export const BoardColumn = ({
@@ -26,8 +28,10 @@ export const BoardColumn = ({
   onTaskCreated,
   onTaskDeleted,
   onTaskEdited,
-  onColumnDeleted
+  onColumnDeleted,
+  onColumnRenamed
 }: BoardColumnProps) => {
+  const isBacklog = id === 'backlog';
   const tasksNode = (
     <Space direction='vertical' style={{ width: '100%' }}>
       {tasks
@@ -62,33 +66,49 @@ export const BoardColumn = ({
           ref={innerRef}
           direction='vertical'
           style={{
-            width: '272px'
+            width: '275px'
           }}
         >
           <Row justify='space-between' align='middle'>
             <Col>
-              <h1>{title}</h1>
+              <Title
+                level={4}
+                style={{ margin: 0, width: '225px' }}
+                editable={{
+                  triggerType: isBacklog ? [] : ['text'],
+                  onChange: text => {
+                    title = text;
+                  },
+                  onEnd: () => onColumnRenamed(id, title)
+                }}
+                ellipsis={{ rows: 1 }}
+              >
+                {title}
+              </Title>
             </Col>
-            <Col>
-              <Tooltip title='Delete Column'>
-                <Button
-                  type='primary'
-                  icon={<CloseOutlined />}
-                  danger
-                  size='small'
-                  onClick={() => onColumnDeleted(id)}
-                />
-              </Tooltip>
-            </Col>
+            {id !== 'backlog' && (
+              <Col>
+                <Tooltip title='Delete Column' placement='left'>
+                  <Popconfirm
+                    title='Delete Task'
+                    description='Are you sure you want to delete this task?'
+                    icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                    okButtonProps={{ danger: true }}
+                    okText='Yes'
+                    cancelText='No'
+                    onConfirm={() => onColumnDeleted(id)}
+                  >
+                    <Button type='primary' icon={<DeleteFilled />} danger size='small' />
+                  </Popconfirm>
+                </Tooltip>
+              </Col>
+            )}
           </Row>
           <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 250px)' }} className='scrollbar'>
             {tasksNode}
             {placeholder}
           </div>
-          <AddNewItem
-            onAdd={text => onTaskCreated(text, id)}
-            toggleButtonText='+ Add another Task'
-          />
+          <AddNewItem onAdd={text => onTaskCreated(text, id)} toggleButtonText='Add Task' />
         </Space>
       )}
     </StrictModeDroppable>

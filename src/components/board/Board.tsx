@@ -220,6 +220,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         { columnId: null, data: newTask },
         {
           onSuccess: task => {
+            task.subtasks = task.subtasks ?? [];
             setBacklog([...backlog, task]);
           }
         }
@@ -241,6 +242,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
         { columnId, data: newTask },
         {
           onSuccess: task => {
+            task.subtasks = task.subtasks ?? [];
             column.tasks.push(task);
             setBoard({ ...board });
           }
@@ -249,9 +251,13 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
     }
   };
 
-  const handleTaskEdited = (taskId: string, task: Task) => {};
+  const handleTaskEdited = (taskId: string, task: Task) => {
+    setBoard({ ...board });
+    updateTaskMutation.mutate(task);
+  };
 
-  const handleTaskDeleted = (taskId: string, columnId: string) => {
+  const handleTaskDeleted = (taskId: string, columnId: string | null) => {
+    columnId = columnId ?? BACKLOG_ID;
     const inBacklog = columnId === BACKLOG_ID;
 
     if (inBacklog) {
@@ -280,6 +286,14 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
     board.columns = board.columns.filter(column => column.id !== columnId);
     setBoard({ ...board });
     deleteColumnMutation.mutate(columnId);
+  };
+
+  const handleColumnRenamed = (columnId: string, newTitle: string) => {
+    const renamedColumn = board.columns.find(column => column.id === columnId);
+    if (!renamedColumn) return;
+    renamedColumn.title = newTitle;
+    setBoard({ ...board });
+    updateColumnMutation.mutate({ columnId, data: renamedColumn });
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -326,6 +340,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
               onTaskCreated={handleTaskCreated}
               onTaskDeleted={handleTaskDeleted}
               onColumnDeleted={handleColumnDeleted}
+              onColumnRenamed={() => {}}
               onTaskEdited={handleTaskEdited}
               tasks={backlog}
               index={0}
@@ -344,7 +359,6 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                   {(provided, snapshot) => (
                     <div
                       key={column.id}
-                      style={{ width: '272px' }}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -353,6 +367,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
                         onTaskCreated={handleTaskCreated}
                         onTaskDeleted={handleTaskDeleted}
                         onColumnDeleted={handleColumnDeleted}
+                        onColumnRenamed={handleColumnRenamed}
                         onTaskEdited={handleTaskEdited}
                         tasks={column.tasks}
                         index={column.position}
@@ -365,7 +380,7 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
               ))}
             {placeholder}
             <div style={{ width: '200px' }}>
-              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='+ Add another column' />
+              <AddNewItem onAdd={handleColumnCreated} toggleButtonText='Add column' />
             </div>
           </Space>
         )}
