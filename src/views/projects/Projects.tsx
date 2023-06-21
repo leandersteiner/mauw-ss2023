@@ -7,7 +7,6 @@ import { Project } from '../../models/project/Project';
 import { getProjects } from '../../api/projectsApi';
 import { ProjectEntry } from '../../components/project/ProjectEntry';
 import { CreateProjectModal } from '../../components/project/CreateProjectModal';
-import { DateUtils } from '../../helpers/date';
 
 const topBarStyle: CSSProperties = {
   display: 'flex',
@@ -21,7 +20,7 @@ export const Projects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
 
-  const { isLoading, isError, error, data } = useQuery<Project[], Error>({
+  const { isLoading, data, refetch } = useQuery<Project[], Error>({
     queryKey: ['projects'],
     queryFn: getProjects
   });
@@ -60,7 +59,7 @@ export const Projects = () => {
         {projects?.map(project => {
           return (
             <Col xs={24} sm={12} md={8} lg={8} xl={6} key={project.id}>
-              <ProjectEntry project={project} key={project.id} />
+              <ProjectEntry project={project} refetch={refetch} key={project.id} />
             </Col>
           );
         })}
