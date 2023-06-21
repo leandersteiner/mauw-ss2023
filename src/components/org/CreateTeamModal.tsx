@@ -28,11 +28,12 @@ type CreateTeamModalProps = {
 export const CreateTeamModal: React.FC<CreateTeamModalProps> = (props: CreateTeamModalProps) => {
   const [isPrivate, setIsPrivate] = useState<boolean>(true);
   const [teamName, setTeamName] = useState<string>('');
-
+  const [isCreatingTeam, setIsCreatingTeam] = useState<boolean>(false);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const { mutate: createTeamMutation } = useMutation(createTeam, {
     onSuccess: (response: Team) => {
+      setIsCreatingTeam(false);
       props.setIsCreateTeamModalOpen(false);
       setIsValid(false);
       props.refetch();
@@ -52,6 +53,7 @@ export const CreateTeamModal: React.FC<CreateTeamModalProps> = (props: CreateTea
 
   const submitCreateOrganisation = () => {
     if (isValid) {
+      setIsCreatingTeam(true);
       createTeamMutation({
         orgId: props.organisationId,
         body: { name: teamName, private: isPrivate }
@@ -79,7 +81,7 @@ export const CreateTeamModal: React.FC<CreateTeamModalProps> = (props: CreateTea
         <Button
           key='submit'
           type='primary'
-          loading={undefined}
+          loading={isCreatingTeam}
           onClick={submitCreateOrganisation}
           disabled={!isValid}
         >
