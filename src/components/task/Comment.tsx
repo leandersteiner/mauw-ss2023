@@ -5,6 +5,7 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import { TaskComment } from '../../models/task/TaskComment';
 import { useAuth } from '../../context/AuthContext';
 import { stringToColorCode } from '../../helpers/color';
+import { EditableMarkdown } from './EditableMarkdown';
 
 const { Text } = Typography;
 
@@ -57,6 +58,7 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
         </Row>
       }
     >
+      <EditableMarkdown text={comment.comment} />
       <Paragraph
         style={{ margin: 0 }}
         editable={
