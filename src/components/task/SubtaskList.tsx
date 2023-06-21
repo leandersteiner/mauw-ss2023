@@ -1,17 +1,36 @@
 import Title from 'antd/es/typography/Title';
 import { Space } from 'antd';
+import { Subtask as SubtaskModel } from '../../models/task/Subtask';
 import { Subtask } from './Subtask';
+import { AddNewItem } from '../board/AddNewItem';
 
-export const SubtaskList = () => {
+type SubtaskListProps = {
+  tasks: SubtaskModel[];
+  onSubtaskCreated: (title: string) => void;
+  onSubtaskUpdated: (subtaskId: string, subtask: SubtaskModel) => void;
+  onSubtaskDeleted: (subtaskId: string) => void;
+};
+export const SubtaskList = ({
+  tasks,
+  onSubtaskCreated,
+  onSubtaskUpdated,
+  onSubtaskDeleted
+}: SubtaskListProps) => {
   return (
     <>
-      <Title level={4} style={{ marginTop: 0 }}>
-        SubtaskList
-      </Title>
+      <Title level={4}>SubtaskList</Title>
       <Space direction='vertical'>
-        <Subtask />
-        <Subtask />
-        <Subtask />
+        {tasks
+          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+          .map(task => (
+            <Subtask
+              key={task.id}
+              task={task}
+              onSubtaskUpdated={onSubtaskUpdated}
+              onSubtaskDeleted={onSubtaskDeleted}
+            />
+          ))}
+        <AddNewItem onAdd={onSubtaskCreated} toggleButtonText='Add Subtask' />
       </Space>
     </>
   );
