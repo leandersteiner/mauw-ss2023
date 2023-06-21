@@ -1,5 +1,5 @@
 import Title from 'antd/es/typography/Title';
-import { Space } from 'antd';
+import { Divider, Space } from 'antd';
 import { Subtask as SubtaskModel } from '../../models/task/Subtask';
 import { Subtask } from './Subtask';
 import { AddNewItem } from '../board/AddNewItem';
@@ -19,9 +19,9 @@ export const SubtaskList = ({
   return (
     <>
       <Title level={4}>SubtaskList</Title>
-      <Space direction='vertical'>
+      <Space direction='vertical' size='middle' style={{ width: '100%' }}>
         {tasks
-          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+          ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
           .map(task => (
             <Subtask
               key={task.id}
@@ -30,6 +30,7 @@ export const SubtaskList = ({
               onSubtaskDeleted={onSubtaskDeleted}
             />
           ))}
+        <Divider style={{ margin: 0 }} />
         <AddNewItem onAdd={onSubtaskCreated} toggleButtonText='Add Subtask' />
       </Space>
     </>
