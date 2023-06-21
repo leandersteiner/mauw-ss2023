@@ -1,6 +1,6 @@
 import Title from 'antd/es/typography/Title';
 import { Button, Tooltip } from 'antd';
-import { DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
+import { DeleteOutlined, UserAddOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { CSSProperties } from 'react';
 import { Team } from '../../models/team/Team';
 
@@ -37,8 +37,8 @@ export const TeamEntry: React.FC<TeamEntryProps> = (props: TeamEntryProps) => {
       </Title>
 
       <span style={buttonContainerStyle}>
-        <Tooltip title='Add user'>
-          <Button icon={<UserAddOutlined />} />
+        <Tooltip title='Manage members'>
+          <Button icon={<UserSwitchOutlined />} />
         </Tooltip>
 
         <Tooltip title='Delete'>

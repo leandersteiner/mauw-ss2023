@@ -7,13 +7,14 @@ import {
 import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { DeleteOutlined, UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
-import { Avatar, Button, Collapse, Tooltip } from 'antd';
+import { Avatar, Button, Collapse, Modal, Tooltip } from 'antd';
 import { Organisation } from '../../models/organisation/Organisation';
 import { Team } from '../../models/team/Team';
 import { getTeamOrgs } from '../../api/teamApi';
 import { TeamEntry } from './TeamEntry';
 import { useAuth } from '../../context/AuthContext';
 import { deleteOrg } from '../../api/orgApi';
+import { CreateTeamModal } from './CreateTeamModal';
 
 type OrganisationEntryProps = {
   org: Organisation;
@@ -30,6 +31,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   const [isHover, setIsHover] = useState(false);
 
   const [teams, setTeams] = useState<Team[]>([]);
+  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState<boolean>(false);
 
   const { isLoading, isError, error, data, refetch } = useQuery<Team[], Error>({
     queryKey: ['teams', props.org.id],
@@ -48,11 +50,27 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   };
 
   const getTeamEntryItems = (): ReactNode => {
+    if (teams.length === 0) {
+      return (
+        <Button
+          style={{ width: '100%', marginTop: '10px' }}
+          onClick={() => setIsCreateTeamModalOpen(true)}
+        >
+          Create Team
+        </Button>
+      );
+    }
     return (
       <div>
         {teams?.map(team => {
           return <TeamEntry team={team} key={team.id} />;
         })}
+        <Button
+          style={{ width: '100%', marginTop: '10px' }}
+          onClick={() => setIsCreateTeamModalOpen(true)}
+        >
+          Create Team
+        </Button>
       </div>
     );
   };
@@ -107,68 +125,80 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   };
 
   return (
-    <Collapse
-      bordered={false}
-      onChange={() => fetchTeams()}
-      style={{
-        width: '100%',
-        backgroundColor: '#ffffff'
-      }}
-      expandIconPosition='end'
-      size='large'
-      items={[
-        {
-          key: '1',
-          label: (
-            <div>
-              <div style={organisationEntryContentStyle}>
-                <div style={titleOwnerStyle}>
-                  <Title style={{ margin: '0' }} level={4} ellipsis={{ rows: 1, tooltip: true }}>
-                    {props.org.name}
-                  </Title>
-
-                  <span style={userAvatarStyle}>
-                    <Avatar size='small' icon={<UserOutlined />} />
-                    <Title style={{ margin: '0' }} level={5} ellipsis={{ rows: 1, tooltip: true }}>
-                      {props.org.owner.username}
+    <div>
+      <CreateTeamModal
+        organisationId={props.org.id}
+        isCreateTeamModalOpen={isCreateTeamModalOpen}
+        setIsCreateTeamModalOpen={setIsCreateTeamModalOpen}
+        refetch={refetch}
+      />
+      <Collapse
+        bordered={false}
+        onChange={() => fetchTeams()}
+        style={{
+          width: '100%',
+          backgroundColor: '#ffffff'
+        }}
+        expandIconPosition='end'
+        size='large'
+        items={[
+          {
+            key: '1',
+            label: (
+              <div>
+                <div style={organisationEntryContentStyle}>
+                  <div style={titleOwnerStyle}>
+                    <Title style={{ margin: '0' }} level={4} ellipsis={{ rows: 1, tooltip: true }}>
+                      {props.org.name}
                     </Title>
+
+                    <span style={userAvatarStyle}>
+                      <Avatar size='small' icon={<UserOutlined />} />
+                      <Title
+                        style={{ margin: '0' }}
+                        level={5}
+                        ellipsis={{ rows: 1, tooltip: true }}
+                      >
+                        {props.org.owner.username}
+                      </Title>
+                    </span>
+                  </div>
+
+                  <span style={buttonContainerStyle}>
+                    <Tooltip title='Manage members'>
+                      <Button
+                        icon={<UserSwitchOutlined />}
+                        onClick={e => e.stopPropagation()}
+                        disabled={!(props.org.owner.username === user?.username)}
+                      />
+                    </Tooltip>
+
+                    <Tooltip title='Delete'>
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={e => {
+                          e.stopPropagation();
+                          const response: Promise<number> = deleteOrg(props.org.id);
+                          response
+                            .then(() => {
+                              props.refetch();
+                            })
+                            // eslint-disable-next-line @typescript-eslint/no-shadow
+                            .catch((error: Error) => {
+                              alert(error.message);
+                            });
+                        }}
+                      />
+                    </Tooltip>
                   </span>
                 </div>
-
-                <span style={buttonContainerStyle}>
-                  <Tooltip title='Manage users'>
-                    <Button
-                      icon={<UserSwitchOutlined />}
-                      onClick={e => e.stopPropagation()}
-                      disabled={!(props.org.owner.username === user?.username)}
-                    />
-                  </Tooltip>
-
-                  <Tooltip title='Delete'>
-                    <Button
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={e => {
-                        e.stopPropagation();
-                        const response: Promise<number> = deleteOrg(props.org.id);
-                        response
-                          .then(() => {
-                            props.refetch();
-                          })
-                          // eslint-disable-next-line @typescript-eslint/no-shadow
-                          .catch((error: Error) => {
-                            alert(error.message);
-                          });
-                      }}
-                    />
-                  </Tooltip>
-                </span>
               </div>
-            </div>
-          ),
-          children: getTeamEntryItems()
-        }
-      ]}
-    />
+            ),
+            children: getTeamEntryItems()
+          }
+        ]}
+      />
+    </div>
   );
 };
