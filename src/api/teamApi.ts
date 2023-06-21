@@ -23,4 +23,4 @@ export const addUserToTeam = (addUserToTeamRequest: AddUserToTeamRequest) =>
     .then(res => res.data);
 
 export const deleteTeam = (orgId: string, teamId: string) =>
-  api.delete(`orgs/${orgId}/teams/${teamId}`);
+  api.delete(`orgs/${orgId}/teams/${teamId}`).then(res => res.status);

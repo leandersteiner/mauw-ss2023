@@ -23,6 +23,43 @@ type OrganisationEntryProps = {
   ) => Promise<QueryObserverResult<Organisation[], Error>>;
 };
 
+const organisationEntryContentStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  alignContent: 'center',
+  gap: '30px',
+  width: '100%'
+};
+
+const titleOwnerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  alignContent: 'center',
+  gap: '30px',
+  width: '90%'
+};
+
+const userAvatarStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  alignContent: 'center',
+  gap: '10px'
+};
+
+const buttonContainerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'row',
+  alignContent: 'flex-end',
+  alignItems: 'center',
+  gap: '10px'
+};
+
 export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   props: OrganisationEntryProps
 ) => {
@@ -63,7 +100,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
     return (
       <div>
         {teams?.map(team => {
-          return <TeamEntry team={team} key={team.id} />;
+          return <TeamEntry team={team} refetch={refetch} key={team.id} />;
         })}
         <Button
           style={{ width: '100%', marginTop: '10px' }}
@@ -85,43 +122,6 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
       : 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
     width: '100%',
     height: '60px'
-  };
-
-  const organisationEntryContentStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    alignContent: 'center',
-    gap: '30px',
-    width: '100%'
-  };
-
-  const titleOwnerStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    alignContent: 'center',
-    gap: '30px',
-    width: '90%'
-  };
-
-  const userAvatarStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    alignContent: 'center',
-    gap: '10px'
-  };
-
-  const buttonContainerStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
-    alignContent: 'flex-end',
-    alignItems: 'center',
-    gap: '10px'
   };
 
   return (
