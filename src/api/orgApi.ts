@@ -15,7 +15,7 @@ export const createOrg = (createOrgRequest: CreateOrganisationRequest) =>
 
 export const addUserToOrg = (addUserToOrgRequest: AddUserToOrganisationRequest) =>
   api
-    .post<Organisation>(`orgs/${addUserToOrgRequest.orgId}`, addUserToOrgRequest)
+    .post<Organisation>(`orgs/${addUserToOrgRequest.organisationId}`, addUserToOrgRequest)
     .then(res => res.data);
 
 export const deleteOrg = (orgId: string) => api.delete(`orgs/${orgId}`).then(res => res.status);

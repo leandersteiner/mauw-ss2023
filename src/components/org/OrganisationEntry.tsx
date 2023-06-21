@@ -7,14 +7,15 @@ import {
 import { CSSProperties, ReactNode, useEffect, useState } from 'react';
 import { DeleteOutlined, UserOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
-import { Avatar, Button, Collapse, Modal, Tooltip } from 'antd';
+import { Avatar, Button, Collapse, Tooltip } from 'antd';
 import { Organisation } from '../../models/organisation/Organisation';
 import { Team } from '../../models/team/Team';
 import { getTeamOrgs } from '../../api/teamApi';
 import { TeamEntry } from './TeamEntry';
 import { useAuth } from '../../context/AuthContext';
-import { deleteOrg } from '../../api/orgApi';
+import { deleteOrg, getOrgById } from '../../api/orgApi';
 import { CreateTeamModal } from './CreateTeamModal';
+import { MemberManagementModal } from '../user-management/MemberManagementModal';
 
 type OrganisationEntryProps = {
   org: Organisation;
@@ -67,23 +68,44 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
 
   const [isHover, setIsHover] = useState(false);
 
+  const [org, setOrg] = useState<Organisation>(props.org);
   const [teams, setTeams] = useState<Team[]>([]);
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState<boolean>(false);
 
-  const { isLoading, isError, error, data, refetch } = useQuery<Team[], Error>({
-    queryKey: ['teams', props.org.id],
-    queryFn: () => getTeamOrgs(props.org.id),
+  const [isMemberManagementModalOpen, setIsMemberManagementModalOpen] = useState(false);
+
+  const { data: teamData, refetch: refetchTeam } = useQuery<Team[], Error>({
+    queryKey: ['teams', org.id],
+    queryFn: () => getTeamOrgs(org.id),
+    enabled: false
+  });
+
+  const {
+    isLoading,
+    isError,
+    error,
+    data: orgData,
+    refetch: refetchOrg
+  } = useQuery<Organisation, Error>({
+    queryKey: ['org', org.id],
+    queryFn: () => getOrgById(org.id),
     enabled: false
   });
 
   useEffect(() => {
-    if (data !== undefined) {
-      setTeams(data);
+    if (teamData !== undefined) {
+      setTeams(teamData);
     }
-  }, [data]);
+  }, [teamData]);
+
+  useEffect(() => {
+    if (orgData !== undefined) {
+      setOrg(orgData);
+    }
+  }, [orgData]);
 
   const fetchTeams = () => {
-    refetch();
+    refetchTeam();
   };
 
   const getTeamEntryItems = (): ReactNode => {
@@ -100,7 +122,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
     return (
       <div>
         {teams?.map(team => {
-          return <TeamEntry team={team} refetch={refetch} key={team.id} />;
+          return <TeamEntry team={team} refetch={refetchTeam} key={team.id} />;
         })}
         <Button
           style={{ width: '100%', marginTop: '10px' }}
@@ -124,11 +146,21 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   return (
     <div>
       <CreateTeamModal
-        organisationId={props.org.id}
+        organisationId={org.id}
         isCreateTeamModalOpen={isCreateTeamModalOpen}
         setIsCreateTeamModalOpen={setIsCreateTeamModalOpen}
-        refetch={refetch}
+        refetch={refetchTeam}
       />
+
+      <MemberManagementModal
+        isMemberManagementModalOpen={isMemberManagementModalOpen}
+        setIsMemberManagementModalOpen={setIsMemberManagementModalOpen}
+        owner={org.owner}
+        members={org.members}
+        refetch={refetchOrg}
+        orgId={org.id}
+      />
+
       <Collapse
         bordered={false}
         onChange={() => fetchTeams()}
@@ -143,7 +175,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
                 <div style={organisationEntryContentStyle}>
                   <div style={titleOwnerStyle}>
                     <Title style={{ margin: '0' }} level={4} ellipsis={{ rows: 1, tooltip: true }}>
-                      {props.org.name}
+                      {org.name}
                     </Title>
 
                     <Tooltip title='Owner'>
@@ -154,7 +186,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
                           level={5}
                           ellipsis={{ rows: 1, tooltip: true }}
                         >
-                          {props.org.owner.username}
+                          {org.owner.username}
                         </Title>
                       </span>
                     </Tooltip>
@@ -164,8 +196,11 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
                     <Tooltip title='Manage members'>
                       <Button
                         icon={<UserSwitchOutlined />}
-                        onClick={e => e.stopPropagation()}
-                        disabled={!(props.org.owner.username === user?.username)}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setIsMemberManagementModalOpen(true);
+                        }}
+                        disabled={!(org.owner.username === user?.username)}
                       />
                     </Tooltip>
 
@@ -175,7 +210,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
                         icon={<DeleteOutlined />}
                         onClick={e => {
                           e.stopPropagation();
-                          const response: Promise<number> = deleteOrg(props.org.id);
+                          const response: Promise<number> = deleteOrg(org.id);
                           response
                             .then(() => {
                               props.refetch();

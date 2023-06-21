@@ -7,7 +7,6 @@ import { Project } from '../../models/project/Project';
 import { getProjects } from '../../api/projectsApi';
 import { ProjectEntry } from '../../components/project/ProjectEntry';
 import { CreateProjectModal } from '../../components/project/CreateProjectModal';
-import { DateUtils } from '../../helpers/date';
 
 const topBarStyle: CSSProperties = {
   display: 'flex',

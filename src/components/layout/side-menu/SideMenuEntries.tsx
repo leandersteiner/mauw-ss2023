@@ -48,7 +48,6 @@ export function createLoggedInTopSideMenuEntries(
 
   projectChildEntries.push({
     label: 'All Projects',
-    icon: <ProjectOutlined />,
     key: 'projects',
     onClick: () => navigate('/home/projects' ?? '/')
   } as MenuItem);

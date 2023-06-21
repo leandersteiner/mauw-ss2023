@@ -7,18 +7,13 @@ import { Organisation } from '../../models/organisation/Organisation';
 import { getOrgs } from '../../api/orgApi';
 import { OrganisationEntry } from '../../components/org/OrganisationEntry';
 import { CreateOrganisationModal } from '../../components/org/CreateOrganisationModal';
+import { MemberManagementModal } from '../../components/user-management/MemberManagementModal';
+import { User } from '../../models/user/User';
 
 const topBarStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'flex-end',
   marginBottom: '10px'
-};
-
-const orgsWrapperStyle: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'flex-start',
-  flexDirection: 'column',
-  gap: '20px'
 };
 
 export const Organisations = () => {

@@ -5,6 +5,7 @@ import { DeleteOutlined, UserSwitchOutlined } from '@ant-design/icons';
 import { CSSProperties, useState } from 'react';
 import { Team } from '../../models/team/Team';
 import { deleteTeam } from '../../api/teamApi';
+import { MemberManagementModal } from '../user-management/MemberManagementModal';
 
 type TeamEntryProps = {
   team: Team;
@@ -32,6 +33,7 @@ const teamEntryWrapperStyle: CSSProperties = {
 
 export const TeamEntry: React.FC<TeamEntryProps> = (props: TeamEntryProps) => {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isMemberManagementModalOpen, setIsMemberManagementModalOpen] = useState(false);
 
   const handleDeleteTeam = () => {
     setIsDeleting(true);
@@ -48,29 +50,44 @@ export const TeamEntry: React.FC<TeamEntryProps> = (props: TeamEntryProps) => {
   };
 
   return (
-    <div style={teamEntryWrapperStyle}>
-      <Title
-        style={{ margin: '0', maxWidth: '50%' }}
-        level={4}
-        ellipsis={{ rows: 1, tooltip: true }}
-      >
-        {props.team.name}
-      </Title>
+    <div>
+      <MemberManagementModal
+        isMemberManagementModalOpen={isMemberManagementModalOpen}
+        setIsMemberManagementModalOpen={setIsMemberManagementModalOpen}
+        owner={props.team.owner}
+        members={props.team.members}
+        refetch={props.refetch}
+        orgId={props.team.organisation.id}
+        teamId={props.team.id}
+      />
 
-      <span style={buttonContainerStyle}>
-        <Tooltip title='Manage members'>
-          <Button icon={<UserSwitchOutlined />} />
-        </Tooltip>
+      <div style={teamEntryWrapperStyle}>
+        <Title
+          style={{ margin: '0', maxWidth: '50%' }}
+          level={4}
+          ellipsis={{ rows: 1, tooltip: true }}
+        >
+          {props.team.name}
+        </Title>
 
-        <Tooltip title='Delete'>
-          <Button
-            danger
-            loading={isDeleting}
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeleteTeam()}
-          />
-        </Tooltip>
-      </span>
+        <span style={buttonContainerStyle}>
+          <Tooltip title='Manage members'>
+            <Button
+              icon={<UserSwitchOutlined />}
+              onClick={() => setIsMemberManagementModalOpen(true)}
+            />
+          </Tooltip>
+
+          <Tooltip title='Delete'>
+            <Button
+              danger
+              loading={isDeleting}
+              icon={<DeleteOutlined />}
+              onClick={() => handleDeleteTeam()}
+            />
+          </Tooltip>
+        </span>
+      </div>
     </div>
   );
 };

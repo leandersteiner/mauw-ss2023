@@ -81,7 +81,7 @@ export const SideMenu: React.FC = () => {
             mode='inline'
             items={topEntries}
             selectedKeys={[path]}
-            defaultOpenKeys={['projectsList']}
+            defaultOpenKeys={['recentProjects']}
           />
         </div>
         <div>

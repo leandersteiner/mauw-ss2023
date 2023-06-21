@@ -19,5 +19,5 @@ export interface CreateOrganisationRequest {
 
 export interface AddUserToOrganisationRequest {
   userId: string;
-  orgId: string;
+  organisationId: string;
 }
