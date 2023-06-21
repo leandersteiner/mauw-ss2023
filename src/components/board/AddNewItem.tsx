@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { AddItemButton } from './AddItemButton';
+import { Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { NewItemForm } from './NewItemForm';
 
 type AddNewItemProps = {
@@ -25,5 +26,9 @@ export const AddNewItem = (props: AddNewItemProps) => {
     );
   }
 
-  return <AddItemButton onClick={() => setShowForm(true)}>{toggleButtonText}</AddItemButton>;
+  return (
+    <Button onClick={() => setShowForm(true)} icon={<PlusOutlined />}>
+      {toggleButtonText}
+    </Button>
+  );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NewItemButton, NewItemFormContainer, NewItemInput } from './AddItemButton';
+import { Button, Input, Space } from 'antd';
 import { useFocus } from '../../hooks/useFocus';
 
 type NewItemFormProps = {
@@ -17,14 +17,16 @@ export const NewItemForm = ({ onAdd }: NewItemFormProps) => {
   };
 
   return (
-    <NewItemFormContainer>
-      <NewItemInput
-        ref={inputRef}
+    <Space direction='vertical'>
+      <Input
         value={text}
+        ref={inputRef}
         onChange={e => setText(e.target.value)}
-        onKeyDown={handleAddText}
+        onPressEnter={handleAddText}
       />
-      <NewItemButton onClick={() => onAdd(text)}>Create</NewItemButton>
-    </NewItemFormContainer>
+      <Space>
+        <Button onClick={() => onAdd(text)}>Create</Button>
+      </Space>
+    </Space>
   );
 };
