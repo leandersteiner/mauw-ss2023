@@ -62,14 +62,14 @@ export const BoardColumnTask = ({
         <Space direction='vertical' onClick={() => setIsTaskOverviewModalOpen(true)}>
           <Title
             level={5}
-            style={{ margin: '0' }}
-            editable={{
+            style={{ margin: '0', cursor: 'pointer' }}
+            /* editable={{
               onChange: text => {
                 task.name = text;
               },
               onEnd: () => onTaskEdited(task.id, task),
               triggerType: ['text']
-            }}
+            }} */
           >
             {name}
           </Title>
