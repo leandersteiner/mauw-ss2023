@@ -65,13 +65,11 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   props: OrganisationEntryProps
 ) => {
   const { user } = useAuth();
-
   const [isHover, setIsHover] = useState(false);
-
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [org, setOrg] = useState<Organisation>(props.org);
   const [teams, setTeams] = useState<Team[]>([]);
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState<boolean>(false);
-
   const [isMemberManagementModalOpen, setIsMemberManagementModalOpen] = useState(false);
 
   const { data: teamData, refetch: refetchTeam } = useQuery<Team[], Error>({
@@ -202,16 +200,19 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
                       <Button
                         danger
                         icon={<DeleteOutlined />}
+                        loading={isDeleting}
                         onClick={e => {
                           e.stopPropagation();
+                          setIsDeleting(true);
                           const response: Promise<number> = deleteOrg(org.id);
                           response
                             .then(() => {
                               props.refetch();
+                              setIsDeleting(false);
                             })
-                            // eslint-disable-next-line @typescript-eslint/no-shadow
                             .catch((error: Error) => {
                               alert(error.message);
+                              setIsDeleting(false);
                             });
                         }}
                       />
