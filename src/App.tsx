@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
@@ -15,6 +14,8 @@ import { Settings } from './views/settings/Settings';
 import { Organisations } from './views/organisations/Organisations';
 import { Projects } from './views/projects/Projects';
 import { NotFound } from './views/NotFound';
+import 'easymde/dist/easymde.min.css';
+import 'highlight.js/styles/a11y-light.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
