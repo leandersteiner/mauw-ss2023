@@ -1,4 +1,4 @@
-import { Button, Col, Divider, Popconfirm, Row, Typography } from 'antd';
+import { Button, Col, Divider, Popconfirm, Row, Select, Space, Typography } from 'antd';
 import Title from 'antd/es/typography/Title';
 import { useState } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
@@ -7,7 +7,6 @@ import { Navigate } from 'react-router-dom';
 import { Task } from '../../models/task/Task';
 import { SubtaskList } from './SubtaskList';
 import { CommentList } from './CommentList';
-import { AssigneeList } from './AssigneeList';
 import {
   CommentResponse,
   createComment,
@@ -23,6 +22,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { Subtask } from '../../models/task/Subtask';
 import { TaskComment } from '../../models/task/TaskComment';
+import { EditableMarkdown } from './EditableMarkdown';
 
 const { Paragraph } = Typography;
 
@@ -103,6 +103,14 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
     deleteCommentMutation.mutate(commentId);
   };
 
+  const onChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
+
+  const onSearch = (value: string) => {
+    console.log('search:', value);
+  };
+
   return (
     <>
       <Row>
@@ -122,6 +130,10 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
       </Row>
       <Row gutter={16}>
         <Col sm={24} lg={16}>
+          <Title level={4} style={{ marginTop: 0 }}>
+            Markdown Description
+          </Title>
+          <EditableMarkdown text={description} />
           <Title level={4} style={{ marginTop: 0 }}>
             Description
           </Title>
@@ -148,20 +160,53 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
           />
         </Col>
         <Col sm={24} lg={8}>
-          <AssigneeList />
-          <Popconfirm
-            title='Delete Task'
-            description='Are you sure you want to delete this task?'
-            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-            okButtonProps={{ danger: true }}
-            okText='Yes'
-            cancelText='No'
-            onConfirm={() => onTaskDeleted(task.id, task.boardColumnId)}
-          >
-            <Button type='primary' danger>
-              Delete Task
-            </Button>
-          </Popconfirm>
+          <Space direction='vertical' style={{ width: '100%' }}>
+            <Title level={4} style={{ marginTop: 0 }}>
+              Add
+            </Title>
+            <Select
+              style={{ width: '100%' }}
+              showSearch
+              placeholder='Select a person'
+              optionFilterProp='children'
+              onChange={onChange}
+              onSearch={onSearch}
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              options={[
+                {
+                  value: 'jack',
+                  label: 'Jack'
+                },
+                {
+                  value: 'lucy',
+                  label: 'Lucy'
+                },
+                {
+                  value: 'tom',
+                  label: 'Tom'
+                }
+              ]}
+            />
+            <Title level={4} style={{ marginTop: 0 }}>
+              Actions
+            </Title>
+            <Button block>Move Task</Button>
+            <Popconfirm
+              title='Delete Task'
+              description='Are you sure you want to delete this task?'
+              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+              okButtonProps={{ danger: true }}
+              okText='Yes'
+              cancelText='No'
+              onConfirm={() => onTaskDeleted(task.id, task.boardColumnId)}
+            >
+              <Button type='primary' block danger>
+                Delete Task
+              </Button>
+            </Popconfirm>
+          </Space>
         </Col>
       </Row>
     </>

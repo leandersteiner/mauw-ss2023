@@ -19,7 +19,7 @@ export const TaskOverviewModal = ({
 }: TaskOverviewModalProps) => {
   return (
     <Modal
-      title='Basic Modal'
+      title={task.name}
       open={isOpen}
       width='80%'
       onCancel={close}
