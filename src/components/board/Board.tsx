@@ -28,6 +28,7 @@ import {
   UpdateBoardColumnRequest
 } from '../../api/boardApi';
 import { User } from '../../models/user/User';
+import { NotFound } from '../../views/NotFound';
 
 const BACKLOG_ID = 'backlog';
 
@@ -74,6 +75,8 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
     mutationFn: deleteBoardColumn(projectId),
     onSuccess: () => queryClient.invalidateQueries(['board'])
   });
+
+  if (!model) return <NotFound />;
 
   const handleCardMoved = (taskId: string, columnId: string, index: number) => {
     const toBacklog = columnId === BACKLOG_ID;

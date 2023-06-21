@@ -14,6 +14,7 @@ import { BoardView } from './views/board/BoardView';
 import { Settings } from './views/settings/Settings';
 import { Organisations } from './views/organisations/Organisations';
 import { Projects } from './views/projects/Projects';
+import { NotFound } from './views/NotFound';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,9 @@ export const App: React.FC = () => {
               <Route path='projects/:projectId/boards' element={<Settings />} />
               <Route path='settings' element={<Settings />} />
               <Route path='orgs' element={<Organisations />} />
+            </Route>
+            <Route path='*' element={<Overview />}>
+              <Route path='*' element={<NotFound />} />
             </Route>
           </Routes>
         </BrowserRouter>
