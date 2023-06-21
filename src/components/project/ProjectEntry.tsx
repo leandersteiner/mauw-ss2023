@@ -75,7 +75,10 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
   }, [data]);
 
   const navigateToProject = () => {
-    navigate(`/home/projects/${props.project.id}/boards` ?? '/');
+    navigate(
+      `/orgs/${project.team.organisation.id}/teams/${project.team.id}/projects/${project.id}/board` ??
+        '/'
+    );
   };
 
   const projectEntryStyle: CSSProperties = {
@@ -114,16 +117,14 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
         onMouseLeave={() => setIsHover(false)}
       >
         <span style={projectHeaderStyle}>
-          <Tooltip placement='bottom' title='Open Project'>
-            <Title
-              style={{ margin: '0', maxWidth: '50%' }}
-              level={4}
-              ellipsis={{ rows: 1, tooltip: true }}
-              onClick={navigateToProject}
-            >
-              {project.name}
-            </Title>
-          </Tooltip>
+          <Title
+            style={{ margin: '0', maxWidth: '50%', cursor: 'pointer' }}
+            level={4}
+            ellipsis={{ rows: 1, tooltip: true }}
+            onClick={navigateToProject}
+          >
+            {project.name}
+          </Title>
           <span style={userAvatarStyle}>
             <Title style={{ margin: '0' }} level={5} ellipsis={{ rows: 1, tooltip: true }}>
               {project.owner.username}
