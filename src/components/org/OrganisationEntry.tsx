@@ -113,15 +113,12 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
   };
 
   const organisationEntryStyle: CSSProperties = {
-    transition: 'box-shadow .3s',
+    width: '100%',
     backgroundColor: '#ffffff',
-    borderRadius: '5px',
-    padding: '10px',
+    transition: 'box-shadow .3s',
     boxShadow: isHover
       ? 'rgba(0, 0, 0, 0.35) 0px 5px 15px'
-      : 'rgba(149, 157, 165, 0.2) 0px 8px 24px',
-    width: '100%',
-    height: '60px'
+      : 'rgba(149, 157, 165, 0.2) 0px 8px 24px'
   };
 
   return (
@@ -135,33 +132,32 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
       <Collapse
         bordered={false}
         onChange={() => fetchTeams()}
-        style={{
-          width: '100%',
-          backgroundColor: '#ffffff'
-        }}
+        style={organisationEntryStyle}
         expandIconPosition='end'
         size='large'
         items={[
           {
             key: '1',
             label: (
-              <div>
+              <div onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
                 <div style={organisationEntryContentStyle}>
                   <div style={titleOwnerStyle}>
                     <Title style={{ margin: '0' }} level={4} ellipsis={{ rows: 1, tooltip: true }}>
                       {props.org.name}
                     </Title>
 
-                    <span style={userAvatarStyle}>
-                      <Avatar size='small' icon={<UserOutlined />} />
-                      <Title
-                        style={{ margin: '0' }}
-                        level={5}
-                        ellipsis={{ rows: 1, tooltip: true }}
-                      >
-                        {props.org.owner.username}
-                      </Title>
-                    </span>
+                    <Tooltip title='Owner'>
+                      <span style={userAvatarStyle}>
+                        <Avatar size='small' icon={<UserOutlined />} />
+                        <Title
+                          style={{ margin: '0' }}
+                          level={5}
+                          ellipsis={{ rows: 1, tooltip: true }}
+                        >
+                          {props.org.owner.username}
+                        </Title>
+                      </span>
+                    </Tooltip>
                   </div>
 
                   <span style={buttonContainerStyle}>
