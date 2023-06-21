@@ -1,10 +1,10 @@
-import { Avatar, Card, Col, Divider, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
+import { Avatar, Card, Col, Popconfirm, Row, Tooltip, Typography } from 'antd';
 import { DeleteOutlined, QuestionCircleOutlined, UserOutlined } from '@ant-design/icons';
-import Meta from 'antd/es/card/Meta';
 import { Navigate } from 'react-router-dom';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { TaskComment } from '../../models/task/TaskComment';
 import { useAuth } from '../../context/AuthContext';
+import { stringToColorCode } from '../../helpers/color';
 
 const { Text } = Typography;
 
@@ -43,45 +43,40 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
             ]
           : []
       }
+      title={
+        <Row justify='space-between' align='middle'>
+          <Col>
+            <Avatar
+              style={{ backgroundColor: stringToColorCode(comment.creator.id), marginRight: '8px' }}
+              icon={<UserOutlined />}
+              shape='square'
+            />
+            <Text>{`${comment.creator.username}`}</Text>
+          </Col>
+          <Col>
+            <Text disabled>{`${comment.createdAt.toDateString()}`}</Text>
+          </Col>
+        </Row>
+      }
     >
-      <Meta
-        title={
-          <Row justify='space-between'>
-            <Col>
-              <Avatar
-                style={{ backgroundColor: '#87d068', marginRight: '8px' }}
-                icon={<UserOutlined />}
-              />
-              <Text>{`${comment.creator.username}`}</Text>
-            </Col>
-            <Col>
-              <Text disabled>{`${comment.createdAt.toDateString()}`}</Text>
-            </Col>
-          </Row>
-        }
-        description={
-          <Space direction='vertical' style={{ width: '100%' }}>
-            <Divider type='horizontal' style={{ margin: 0, backgroundColor: '#f9f9f9' }} />
-            <Paragraph
-              editable={
-                isCreator
-                  ? {
-                      triggerType: ['text'],
-                      onChange: text => {
-                        comment.comment = text;
-                      },
-                      onEnd: () => {
-                        onCommentUpdated(comment.id, comment);
-                      }
-                    }
-                  : false
+      <Paragraph
+        style={{ margin: 0 }}
+        editable={
+          isCreator
+            ? {
+                triggerType: ['text'],
+                onChange: text => {
+                  comment.comment = text;
+                },
+                onEnd: () => {
+                  onCommentUpdated(comment.id, comment);
+                }
               }
-            >
-              {comment.comment}
-            </Paragraph>
-          </Space>
+            : false
         }
-      />
+      >
+        {comment.comment}
+      </Paragraph>
     </Card>
   );
 };
