@@ -53,7 +53,7 @@ export const SideMenu: React.FC = () => {
     ? createLoggedInBottomSideMenuEntries(navigator)
     : createLoggedOutBottomSideMenuEntries(navigator);
 
-  const { isLoading, isError, error, data } = useQuery<Project[], Error>({
+  const { data } = useQuery<Project[], Error>({
     queryKey: ['projects'],
     queryFn: getProjects,
     enabled: !!token
@@ -81,7 +81,7 @@ export const SideMenu: React.FC = () => {
             mode='inline'
             items={topEntries}
             selectedKeys={[path]}
-            defaultOpenKeys={['projectsList']}
+            defaultOpenKeys={['recentProjects']}
           />
         </div>
         <div>

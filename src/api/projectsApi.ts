@@ -29,4 +29,4 @@ export const addUserToProject = (addUserToProjectRequest: AddUserToProjectReques
     .then(res => res.data);
 
 export const deleteProject = (orgId: string, teamId: string, projectId: string) =>
-  api.delete(`orgs/${orgId}/teams/${teamId}/projects/${projectId}`);
+  api.delete(`orgs/${orgId}/teams/${teamId}/projects/${projectId}`).then(res => res.status);

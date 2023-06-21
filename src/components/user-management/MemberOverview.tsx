@@ -1,13 +1,12 @@
-import Title from 'antd/es/typography/Title';
-import Avatar from 'antd/es/avatar';
-import { UserOutlined } from '@ant-design/icons';
-import { Col, Row } from 'antd';
 import { CSSProperties } from 'react';
+import { UserOutlined } from '@ant-design/icons';
+import { Avatar, Row, Col } from 'antd';
+import Title from 'antd/es/typography/Title';
 import { User } from '../../models/user/User';
 
-type UserGridProps = {
-  owner: User;
+type MemberOverviewProps = {
   members: User[];
+  owner: User;
 };
 
 const userAvatarOwnerStyle: CSSProperties = {
@@ -28,7 +27,7 @@ const userAvatarStyle: CSSProperties = {
   gap: '10px'
 };
 
-export const UserGrid: React.FC<UserGridProps> = (props: UserGridProps) => {
+export const MemberOverview: React.FC<MemberOverviewProps> = (props: MemberOverviewProps) => {
   return (
     <div>
       <span style={userAvatarOwnerStyle}>

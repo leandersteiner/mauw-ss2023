@@ -29,7 +29,7 @@ export function createLoggedInTopSideMenuEntries(
     label: 'Organisations',
     icon: <UngroupOutlined />,
     key: 'organisations',
-    onClick: () => navigate('/home/orgs' ?? '/')
+    onClick: () => navigate('/orgs' ?? '/')
   };
 
   const projectChildEntries: MenuItem[] = projects
@@ -41,16 +41,19 @@ export function createLoggedInTopSideMenuEntries(
         label: project.name,
         icon: null,
         key: project.id,
-        onClick: () => navigate(`/home/projects/${project.id}/boards` ?? '/')
+        onClick: () =>
+          navigate(
+            `/orgs/${project.team.organisation.id}/teams/${project.team.id}/projects/${project.id}/board` ??
+              '/'
+          )
       } as MenuItem;
     })
     .slice(0, 8);
 
   projectChildEntries.push({
     label: 'All Projects',
-    icon: <ProjectOutlined />,
     key: 'projects',
-    onClick: () => navigate('/home/projects' ?? '/')
+    onClick: () => navigate('/projects' ?? '/')
   } as MenuItem);
 
   const projectEntry: MenuItem = {
@@ -68,7 +71,7 @@ export function createLoggedInBottomSideMenuEntries(navigate: NavigateFunction):
     label: 'Settings',
     icon: <SettingOutlined />,
     key: 'settings',
-    onClick: () => navigate('/home/settings' ?? '/')
+    onClick: () => navigate('/settings' ?? '/')
   };
 
   const profile: MenuItem = {
