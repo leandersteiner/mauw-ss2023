@@ -1,5 +1,5 @@
-import { Avatar, Card, Col, Popconfirm, Row, Tooltip, Typography } from 'antd';
-import { DeleteOutlined, QuestionCircleOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Col, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
+import { DeleteFilled, QuestionCircleOutlined, UserOutlined } from '@ant-design/icons';
 import { Navigate } from 'react-router-dom';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { TaskComment } from '../../models/task/TaskComment';
@@ -24,25 +24,6 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
   return (
     <Card
       style={{ marginTop: 16 }}
-      actions={
-        isCreator
-          ? [
-              <Tooltip key='delete' placement='bottom' title='Delete Task'>
-                <Popconfirm
-                  title='Delete Task'
-                  description='Are you sure you want to delete this task?'
-                  icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-                  okButtonProps={{ danger: true }}
-                  okText='Yes'
-                  cancelText='No'
-                  onConfirm={() => onCommentDeleted(comment.id)}
-                >
-                  <DeleteOutlined />
-                </Popconfirm>
-              </Tooltip>
-            ]
-          : []
-      }
       title={
         <Row justify='space-between' align='middle'>
           <Col>
@@ -54,7 +35,24 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
             <Text>{`${comment.creator.username}`}</Text>
           </Col>
           <Col>
-            <Text disabled>{`${comment.createdAt.toDateString()}`}</Text>
+            <Space size='middle'>
+              <Text disabled>{`${comment.createdAt.toDateString()}`}</Text>
+              {isCreator && (
+                <Tooltip key='delete' placement='bottom' title='Delete Comment'>
+                  <Popconfirm
+                    title='Delete Comment'
+                    description='Are you sure you want to delete this comment?'
+                    icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                    okButtonProps={{ danger: true }}
+                    okText='Yes'
+                    cancelText='No'
+                    onConfirm={() => onCommentDeleted(comment.id)}
+                  >
+                    <Button type='primary' icon={<DeleteFilled />} danger size='small' />
+                  </Popconfirm>
+                </Tooltip>
+              )}
+            </Space>
           </Col>
         </Row>
       }
