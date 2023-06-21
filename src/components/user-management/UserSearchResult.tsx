@@ -9,11 +9,9 @@ import {
 } from '@tanstack/react-query';
 import { User } from '../../models/user/User';
 import { addUserToOrg } from '../../api/orgApi';
-import { Organisation } from '../../models/organisation/Organisation';
 import { addUserToTeam } from '../../api/teamApi';
-import { Team } from '../../models/team/Team';
 import { addUserToProject } from '../../api/projectsApi';
-import { AddUserToProjectRequest, Project } from '../../models/project/Project';
+import { AddUserToProjectRequest } from '../../models/project/Project';
 
 type UserSearchResultProps = {
   user: User;
@@ -46,7 +44,7 @@ export const UserSearchResult: React.FC<UserSearchResultProps> = (props: UserSea
   const [isMember, setIsMember] = useState<boolean>(props.isMember);
 
   const { mutate: addUserToOrgMutation } = useMutation(addUserToOrg, {
-    onSuccess: (response: Organisation) => {
+    onSuccess: () => {
       props.refetch();
       setIsMember(true);
       setIsAddingUser(false);
@@ -58,7 +56,7 @@ export const UserSearchResult: React.FC<UserSearchResultProps> = (props: UserSea
   });
 
   const { mutate: addUserToTeamMutation } = useMutation(addUserToTeam, {
-    onSuccess: (response: Team) => {
+    onSuccess: () => {
       props.refetch();
       setIsMember(true);
       setIsAddingUser(false);
@@ -70,7 +68,7 @@ export const UserSearchResult: React.FC<UserSearchResultProps> = (props: UserSea
   });
 
   const { mutate: addUserToProjectMutation } = useMutation(addUserToProject, {
-    onSuccess: (response: Project) => {
+    onSuccess: () => {
       props.refetch();
       setIsMember(true);
       setIsAddingUser(false);

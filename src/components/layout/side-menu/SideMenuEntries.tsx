@@ -41,7 +41,11 @@ export function createLoggedInTopSideMenuEntries(
         label: project.name,
         icon: null,
         key: project.id,
-        onClick: () => navigate(`/home/projects/${project.id}/boards` ?? '/')
+        onClick: () =>
+          navigate(
+            `/org/${project.team.organisation.id}/teams/${project.team.id}/projects/${project.id}/board` ??
+              '/'
+          )
       } as MenuItem;
     })
     .slice(0, 8);

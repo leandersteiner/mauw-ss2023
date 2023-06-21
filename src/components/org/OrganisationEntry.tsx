@@ -80,13 +80,7 @@ export const OrganisationEntry: React.FC<OrganisationEntryProps> = (
     enabled: false
   });
 
-  const {
-    isLoading,
-    isError,
-    error,
-    data: orgData,
-    refetch: refetchOrg
-  } = useQuery<Organisation, Error>({
+  const { data: orgData, refetch: refetchOrg } = useQuery<Organisation, Error>({
     queryKey: ['org', org.id],
     queryFn: () => getOrgById(org.id),
     enabled: false

@@ -33,7 +33,7 @@ export const CreateOrganisationModal: React.FC<CreateOrganisationModalProps> = (
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const { mutate: createOrgMutation } = useMutation(createOrg, {
-    onSuccess: (response: Organisation) => {
+    onSuccess: () => {
       setIsCreatingOrg(false);
       props.setIsCreateOrganisationModalOpen(false);
       setIsValid(false);

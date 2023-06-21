@@ -32,7 +32,7 @@ export const CreateTeamModal: React.FC<CreateTeamModalProps> = (props: CreateTea
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const { mutate: createTeamMutation } = useMutation(createTeam, {
-    onSuccess: (response: Team) => {
+    onSuccess: () => {
       setIsCreatingTeam(false);
       props.setIsCreateTeamModalOpen(false);
       setIsValid(false);
