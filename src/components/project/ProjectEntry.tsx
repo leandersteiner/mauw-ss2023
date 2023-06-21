@@ -4,7 +4,12 @@ import { Avatar, Button, Tooltip } from 'antd';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useNavigate } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+  useQuery
+} from '@tanstack/react-query';
 import { deleteProject, getProjecById } from '../../api/projectsApi';
 import { Project } from '../../models/project/Project';
 import { useAuth } from '../../context/AuthContext';
@@ -13,6 +18,9 @@ import { MemberManagementModal } from '../user-management/MemberManagementModal'
 
 type ProjectEntryProps = {
   project: Project;
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<QueryObserverResult<Project[], Error>>;
 };
 
 const buttonContainerStyle: CSSProperties = {
@@ -52,6 +60,7 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
   const [isHover, setIsHover] = useState(false);
   const [isMemberManagementModalOpen, setIsMemberManagementModalOpen] = useState(false);
   const [project, setProject] = useState<Project>(props.project);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const { data, refetch } = useQuery<Project, Error>({
     queryKey: ['project', props.project.id],
@@ -143,9 +152,25 @@ export const ProjectEntry: React.FC<ProjectEntryProps> = (props: ProjectEntryPro
               <Button
                 danger
                 icon={<DeleteOutlined />}
-                onClick={() =>
-                  deleteProject(project.team.organisation.id, project.team.id, project.id)
-                }
+                loading={isDeleting}
+                onClick={() => {
+                  setIsDeleting(true);
+                  const response: Promise<number> = deleteProject(
+                    project.team.organisation.id,
+                    project.team.id,
+                    project.id
+                  );
+
+                  response
+                    .then(() => {
+                      props.refetch();
+                      setIsDeleting(false);
+                    })
+                    .catch((error: Error) => {
+                      alert(error.message);
+                      setIsDeleting(false);
+                    });
+                }}
                 disabled={!(project.owner.username === user?.username)}
               />
             </Tooltip>
