@@ -7,7 +7,7 @@ export interface Task {
   description: string;
   done: boolean;
   subtasks: Subtask[];
-  taskComments: TaskComment[];
+  comments: TaskComment[];
   priority: number;
   position: number;
   assigneeId: string;

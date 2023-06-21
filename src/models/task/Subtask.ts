@@ -4,4 +4,5 @@ export interface Subtask {
   done: boolean;
   taskId: string;
   creatorId: string;
+  createdAt: Date;
 }

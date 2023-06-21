@@ -1,6 +1,6 @@
 export interface TaskComment {
   id: string;
-  title: string;
-  content: string;
-  creatorId: string;
+  comment: string;
+  creator: { id: string; email: string; username: string };
+  createdAt: Date;
 }
