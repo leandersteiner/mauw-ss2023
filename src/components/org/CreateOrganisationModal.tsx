@@ -29,11 +29,12 @@ export const CreateOrganisationModal: React.FC<CreateOrganisationModalProps> = (
 ) => {
   const [isPrivate, setIsPrivate] = useState<boolean>(true);
   const [orgName, setOrgName] = useState<string>('');
-
+  const [isCreatingOrg, setIsCreatingOrg] = useState<boolean>(false);
   const [isValid, setIsValid] = useState<boolean>(false);
 
   const { mutate: createOrgMutation } = useMutation(createOrg, {
     onSuccess: (response: Organisation) => {
+      setIsCreatingOrg(false);
       props.setIsCreateOrganisationModalOpen(false);
       setIsValid(false);
       props.refetch();
@@ -53,6 +54,7 @@ export const CreateOrganisationModal: React.FC<CreateOrganisationModalProps> = (
 
   const submitCreateOrganisation = () => {
     if (isValid) {
+      setIsCreatingOrg(true);
       createOrgMutation({ name: orgName, private: isPrivate });
     } else {
       alert('An error occured');
@@ -77,7 +79,7 @@ export const CreateOrganisationModal: React.FC<CreateOrganisationModalProps> = (
         <Button
           key='submit'
           type='primary'
-          loading={undefined}
+          loading={isCreatingOrg}
           onClick={submitCreateOrganisation}
           disabled={!isValid}
         >
