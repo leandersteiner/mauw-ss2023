@@ -10,7 +10,7 @@ export interface Task {
   comments: TaskComment[];
   priority: number;
   position: number;
-  assigneeId: string;
+  assigneeId: string | null;
   taskStateId: string | null;
   sprintId: string;
   projectId: string;

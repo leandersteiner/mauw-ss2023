@@ -1,12 +1,13 @@
 import { Space } from 'antd';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { QueryObserverSuccessResult, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BoardColumn } from './BoardColumn';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { AddNewItem } from './AddNewItem';
 import {
+  BacklogTasksResponse,
   createTask,
   CreateTaskRequest,
   createTaskState,
@@ -36,15 +37,15 @@ const parseDndId = (dndId: string) => dndId.split(':')[1];
 
 type BoardProps = {
   projectId: string;
-  board: BoardModel;
-  backlog: Task[];
+  board: QueryObserverSuccessResult<BoardModel, Error>;
+  backlog: QueryObserverSuccessResult<BacklogTasksResponse, Error>;
   user: User;
 };
 
 export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps) => {
   const queryClient = useQueryClient();
-  const [board, setBoard] = useState<BoardModel>(model);
-  const [backlog, setBacklog] = useState<Task[]>(b);
+  const [board, setBoard] = useState<BoardModel>(model.data);
+  const [backlog, setBacklog] = useState<Task[]>(b.data);
   const [dragging, setDragging] = useState(false);
 
   const updateTaskMutation = useMutation<TaskResponse, Error, Task>({
@@ -252,8 +253,15 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
   };
 
   const handleTaskEdited = (taskId: string, task: Task) => {
-    setBoard({ ...board });
-    updateTaskMutation.mutate(task);
+    board.columns.forEach((column, index) =>
+      column.tasks.forEach((t, i) => {
+        if (t.id === taskId) {
+          board.columns[index].tasks[i] = task;
+          setBoard({ ...board });
+          updateTaskMutation.mutate(task);
+        }
+      })
+    );
   };
 
   const handleTaskDeleted = (taskId: string, columnId: string | null) => {

@@ -37,16 +37,18 @@ export const App: React.FC = () => {
               <Route path='profile' element={<Profile />} />
               <Route path='projects' element={<Projects />} />
               <Route path='orgs' element={<Organisations />} />
-              <Route
-                path='orgs/:orgId/teams/:teamId/projects/:projectId/board'
-                element={<BoardView />}
-              />
               <Route path='settings' element={<Settings />} />
             </Route>
             <Route path='/auth' element={<Overview />}>
               <Route path='login' element={<LoginForm />} />
               <Route path='register' element={<RegistrationForm />} />
               <Route path='logout' element={<Logout />} />
+            </Route>
+            <Route path='' element={<Overview />}>
+              <Route
+                path='/orgs/:orgId/teams/:teamId/projects/:projectId/board'
+                element={<BoardView />}
+              />
             </Route>
             <Route path='*' element={<Overview />}>
               <Route path='*' element={<NotFound />} />

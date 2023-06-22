@@ -59,7 +59,11 @@ export const BoardColumnTask = ({
           </Tooltip>
         ]}
       >
-        <Space direction='vertical' onClick={() => setIsTaskOverviewModalOpen(true)}>
+        <Space
+          direction='vertical'
+          style={{ width: '100%' }}
+          onClick={() => setIsTaskOverviewModalOpen(true)}
+        >
           <Title
             level={5}
             style={{ margin: '0', cursor: 'pointer' }}

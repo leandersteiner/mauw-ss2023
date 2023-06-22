@@ -15,14 +15,21 @@ export const BoardView = () => {
   const { setPath } = usePathContext();
   useEffect(() => setPath('board'));
   const boardQuery = useQuery<BoardResponse, Error>({
-    queryKey: ['board'],
+    queryKey: ['board', projectId],
     queryFn: () => getBoard(projectId ?? '')
   });
 
   const backlogQuery = useQuery<BacklogTasksResponse, Error>({
-    queryKey: ['backlog'],
+    queryKey: ['backlog', projectId],
     queryFn: () => getBacklogTasks(projectId ?? '')
   });
+
+  useEffect(() => {
+    boardQuery.remove();
+    backlogQuery.remove();
+    boardQuery.refetch();
+    backlogQuery.refetch();
+  }, [orgId, teamId, projectId]);
 
   if (!projectId || !teamId || !projectId || !orgId || !user) return <Navigate to='/home' />;
 
@@ -45,7 +52,5 @@ export const BoardView = () => {
     );
   }
 
-  return (
-    <Board projectId={projectId} board={boardQuery.data} backlog={backlogQuery.data} user={user} />
-  );
+  return <Board projectId={projectId} board={boardQuery} backlog={backlogQuery} user={user} />;
 };

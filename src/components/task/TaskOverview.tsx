@@ -1,8 +1,7 @@
-import { Button, Col, Divider, Popconfirm, Row, Select, Space, Typography } from 'antd';
+import { Button, Col, Divider, Popconfirm, Row, Select, Space, Spin } from 'antd';
 import Title from 'antd/es/typography/Title';
-import { useState } from 'react';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { Task } from '../../models/task/Task';
 import { SubtaskList } from './SubtaskList';
@@ -23,8 +22,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Subtask } from '../../models/task/Subtask';
 import { TaskComment } from '../../models/task/TaskComment';
 import { EditableMarkdown } from './EditableMarkdown';
-
-const { Paragraph } = Typography;
+import { getProjectMember } from '../../api/projectsApi';
 
 type TaskOverviewProps = {
   close: () => void;
@@ -36,9 +34,10 @@ type TaskOverviewProps = {
 export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskOverviewProps) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [title, setTitle] = useState(task.name);
-  const [description, setDescription] = useState(task.description);
-
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['members'],
+    queryFn: () => getProjectMember(task.projectId)
+  });
   const createSubtaskMutation = useMutation<SubtaskResponse, Error, CreateSubtaskRequest>({
     mutationFn: createSubtask(task.id),
     onSuccess: subtask => {
@@ -59,9 +58,9 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
 
   const createCommentMutation = useMutation<CommentResponse, Error, CreateCommentRequest>({
     mutationFn: createComment(task.id),
-    onSuccess: subtask => {
+    onSuccess: comment => {
       queryClient.invalidateQueries(['board']);
-      task.comments = [...task.comments, subtask];
+      task.comments.push(comment);
     }
   });
 
@@ -76,6 +75,20 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   });
 
   if (!user) return <Navigate to='/login' />;
+
+  if (isLoading) {
+    return (
+      <Space direction='vertical' style={{ width: '100%' }}>
+        <Spin tip='Loading' size='large'>
+          <div className='content' />
+        </Spin>
+      </Space>
+    );
+  }
+
+  if (isError) {
+    return <div>There was an unexpected error</div>;
+  }
 
   const handleSubtaskCreated = (title: string) => {
     createSubtaskMutation.mutate({ name: title, done: false });
@@ -98,17 +111,17 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
     updateCommentMutation.mutate(comment);
   };
 
+  const handleTaskUpdated = (updatedTask: Task) => {
+    onTaskEdited(task.id, { ...updatedTask });
+  };
+
   const handleCommentDeleted = (commentId: string) => {
     task.comments = task.comments.filter(comment => comment.id !== commentId);
     deleteCommentMutation.mutate(commentId);
   };
 
   const onChange = (value: string) => {
-    console.log(`selected ${value}`);
-  };
-
-  const onSearch = (value: string) => {
-    console.log('search:', value);
+    handleTaskUpdated({ ...task, assigneeId: value });
   };
 
   return (
@@ -119,33 +132,27 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
           <Title
             editable={{
               tooltip: 'click to edit title',
-              onChange: setTitle,
-              triggerType: ['text']
+              onChange: text => {
+                task.name = text;
+              },
+              triggerType: ['text'],
+              onEnd: () => handleTaskUpdated({ ...task })
             }}
             style={{ marginTop: 0 }}
           >
-            {title}
+            {task.name}
           </Title>
         </Col>
       </Row>
       <Row gutter={16}>
         <Col sm={24} lg={16}>
           <Title level={4} style={{ marginTop: 0 }}>
-            Markdown Description
-          </Title>
-          <EditableMarkdown text={description} />
-          <Title level={4} style={{ marginTop: 0 }}>
             Description
           </Title>
-          <Paragraph
-            editable={{
-              tooltip: 'click to edit description',
-              onChange: setDescription,
-              triggerType: ['text']
-            }}
-          >
-            {description}
-          </Paragraph>
+          <EditableMarkdown
+            text={task.description}
+            onSave={text => handleTaskUpdated({ ...task, description: text })}
+          />
           <SubtaskList
             tasks={task.subtasks}
             onSubtaskCreated={handleSubtaskCreated}
@@ -168,31 +175,18 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
               style={{ width: '100%' }}
               showSearch
               placeholder='Select a person'
-              optionFilterProp='children'
+              defaultValue={task.assigneeId}
+              allowClear
+              onClear={() => handleTaskUpdated({ ...task, assigneeId: null })}
               onChange={onChange}
-              onSearch={onSearch}
               filterOption={(input, option) =>
                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
               }
-              options={[
-                {
-                  value: 'jack',
-                  label: 'Jack'
-                },
-                {
-                  value: 'lucy',
-                  label: 'Lucy'
-                },
-                {
-                  value: 'tom',
-                  label: 'Tom'
-                }
-              ]}
+              options={data.map(user => ({ value: user.id, label: user.username }))}
             />
             <Title level={4} style={{ marginTop: 0 }}>
               Actions
             </Title>
-            <Button block>Move Task</Button>
             <Popconfirm
               title='Delete Task'
               description='Are you sure you want to delete this task?'

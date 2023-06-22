@@ -1,7 +1,6 @@
 import { Avatar, Button, Card, Col, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
 import { DeleteFilled, QuestionCircleOutlined, UserOutlined } from '@ant-design/icons';
 import { Navigate } from 'react-router-dom';
-import Paragraph from 'antd/es/typography/Paragraph';
 import { TaskComment } from '../../models/task/TaskComment';
 import { useAuth } from '../../context/AuthContext';
 import { stringToColorCode } from '../../helpers/color';
@@ -58,25 +57,10 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
         </Row>
       }
     >
-      <EditableMarkdown text={comment.comment} />
-      <Paragraph
-        style={{ margin: 0 }}
-        editable={
-          isCreator
-            ? {
-                triggerType: ['text'],
-                onChange: text => {
-                  comment.comment = text;
-                },
-                onEnd: () => {
-                  onCommentUpdated(comment.id, comment);
-                }
-              }
-            : false
-        }
-      >
-        {comment.comment}
-      </Paragraph>
+      <EditableMarkdown
+        text={comment.comment}
+        onSave={text => onCommentUpdated(comment.id, { ...comment, comment: text })}
+      />
     </Card>
   );
 };

@@ -18,7 +18,7 @@ export const SubtaskList = ({
 }: SubtaskListProps) => {
   return (
     <>
-      <Title level={4}>SubtaskList</Title>
+      <Title level={4}>Subtasks</Title>
       <Space direction='vertical' size='middle' style={{ width: '100%' }}>
         {tasks
           ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
