@@ -10,11 +10,11 @@ import { Settings } from './views/settings/Settings';
 import { Organisations } from './views/organisations/Organisations';
 import { Projects } from './views/projects/Projects';
 import { NotFound } from './views/NotFound';
-import 'easymde/dist/easymde.min.css';
-import 'highlight.js/styles/a11y-light.css';
 import { LoginForm } from './components/auth/LoginForm';
 import { RegistrationForm } from './components/auth/RegistrationForm';
 import { Logout } from './components/auth/Logout';
+import 'easymde/dist/easymde.min.css';
+import 'highlight.js/styles/a11y-dark.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

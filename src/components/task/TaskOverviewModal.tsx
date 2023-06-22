@@ -19,7 +19,7 @@ export const TaskOverviewModal = ({
 }: TaskOverviewModalProps) => {
   return (
     <Modal
-      title={task.name}
+      title={`Task Overview: ${task.name}`}
       open={isOpen}
       width='80%'
       onCancel={close}
