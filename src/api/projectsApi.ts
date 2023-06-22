@@ -1,5 +1,6 @@
 import { AddUserToProjectRequest, CreateProjectRequest, Project } from '../models/project/Project';
 import { api } from './api';
+import { User } from '../models/user/User';
 
 export const getProjects = () => api.get<Project[]>('projects').then(res => res.data);
 
@@ -30,3 +31,6 @@ export const addUserToProject = (addUserToProjectRequest: AddUserToProjectReques
 
 export const deleteProject = (orgId: string, teamId: string, projectId: string) =>
   api.delete(`orgs/${orgId}/teams/${teamId}/projects/${projectId}`).then(res => res.status);
+
+export const getProjectMember = (projectId: string) =>
+  api.get<User[]>(`projects/${projectId}/members`).then(res => res.data);

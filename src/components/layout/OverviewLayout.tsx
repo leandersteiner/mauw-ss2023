@@ -1,3 +1,4 @@
+import './scrollbar.css';
 import { Layout, theme } from 'antd';
 import React, { CSSProperties, ReactNode } from 'react';
 
@@ -20,8 +21,7 @@ export const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLay
   };
 
   const contentStyle: CSSProperties = {
-    margin: '24px 16px',
-    padding: 24,
+    padding: '24px 36px',
     overflowY: 'auto',
     height: '100%'
   };
@@ -40,7 +40,9 @@ export const OverviewLayout: React.FC<OverviewLayoutProps> = (props: OverviewLay
       <Layout className='site-layout'>
         <Header style={headerStyle}>{props.headerContent}</Header>
 
-        <Content style={contentStyle}>{props.content}</Content>
+        <Content className='scrollbar' style={contentStyle}>
+          {props.content}
+        </Content>
       </Layout>
     </Layout>
   );

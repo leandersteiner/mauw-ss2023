@@ -26,6 +26,7 @@
   "ignorePatterns": ["vite.config.ts"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-shadow": "off",
     "react-hooks/rules-of-hooks": "error",
     "object-shorthand": "error",
     "no-console": "warn",
@@ -35,10 +36,14 @@
       2,
       { "namedComponents": "arrow-function", "unnamedComponents": "arrow-function" }
     ],
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": false}],
+    "import/no-extraneous-dependencies": "off",
     "react/require-default-props": "off",
     "react/destructuring-assignment": "off",
     "consistent-return": "warn",
-    "jsx-a11y/label-has-associated-control": "off"
+    "jsx-a11y/label-has-associated-control": "off",
+    "react/jsx-props-no-spreading": "off",
+    "no-param-reassign": "off",
+    "no-shadow": "off",
+    "react/no-children-prop": "off"
   }
 }

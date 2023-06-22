@@ -78,7 +78,7 @@ export function createLoggedInBottomSideMenuEntries(navigate: NavigateFunction):
     label: 'Profile',
     icon: <UserOutlined />,
     key: 'profile',
-    onClick: () => navigate('/user' ?? '/')
+    onClick: () => navigate('/profile' ?? '/')
   };
 
   const logout: MenuItem = {
