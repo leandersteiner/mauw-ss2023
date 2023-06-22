@@ -1,22 +1,28 @@
-import { Empty, Space, Typography } from 'antd';
-import Title from 'antd/es/typography/Title';
-import { useEffect } from 'react';
+import { Button, Result } from 'antd';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-const { Text } = Typography;
-
 export const NotFound = () => {
+  const [timeoutId, setTimeoutId] = useState<number>(0);
   const navigate = useNavigate();
   useEffect(() => {
-    setTimeout(() => navigate('/home'), 2000);
+    setTimeoutId(setTimeout(() => navigate('/home'), 2500));
   }, [navigate]);
   return (
-    <Empty
-      description={
-        <Space direction='vertical'>
-          <Title level={2}>404 Not Found</Title>
-          <Text>You are being redirected...</Text>
-        </Space>
+    <Result
+      status='404'
+      title='404'
+      subTitle='Sorry, the page you visited does not exist. You are being redirected...'
+      extra={
+        <Button
+          type='primary'
+          onClick={() => {
+            clearTimeout(timeoutId);
+            navigate('/home');
+          }}
+        >
+          Back Home
+        </Button>
       }
     />
   );
