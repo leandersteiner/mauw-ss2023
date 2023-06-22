@@ -25,13 +25,12 @@ import { EditableMarkdown } from './EditableMarkdown';
 import { getProjectMember } from '../../api/projectsApi';
 
 type TaskOverviewProps = {
-  close: () => void;
   task: Task;
   onTaskDeleted: (taskId: string, columnId: string | null) => void;
   onTaskEdited: (taskId: string, task: Task) => void;
 };
 
-export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskOverviewProps) => {
+export const TaskOverview = ({ task, onTaskDeleted, onTaskEdited }: TaskOverviewProps) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data, isLoading, isError } = useQuery({
@@ -41,8 +40,7 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   const createSubtaskMutation = useMutation<SubtaskResponse, Error, CreateSubtaskRequest>({
     mutationFn: createSubtask(task.id),
     onSuccess: subtask => {
-      queryClient.invalidateQueries(['board']);
-      task.subtasks.push(subtask);
+      queryClient.invalidateQueries(['board']).then(() => task.subtasks.push(subtask));
     }
   });
 
@@ -59,8 +57,7 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   const createCommentMutation = useMutation<CommentResponse, Error, CreateCommentRequest>({
     mutationFn: createComment(task.id),
     onSuccess: comment => {
-      queryClient.invalidateQueries(['board']);
-      task.comments.push(comment);
+      queryClient.invalidateQueries(['board']).then(() => task.comments.push(comment));
     }
   });
 
@@ -112,7 +109,6 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   };
 
   const handleTaskUpdated = (updatedTask: Task) => {
-    console.log(updatedTask);
     onTaskEdited(task.id, { ...updatedTask });
   };
 

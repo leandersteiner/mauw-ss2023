@@ -30,12 +30,7 @@ export const TaskOverviewModal = ({
         </Button>
       ]}
     >
-      <TaskOverview
-        task={task}
-        close={() => close}
-        onTaskEdited={onTaskEdited}
-        onTaskDeleted={onTaskDeleted}
-      />
+      <TaskOverview task={task} onTaskEdited={onTaskEdited} onTaskDeleted={onTaskDeleted} />
     </Modal>
   );
 };
