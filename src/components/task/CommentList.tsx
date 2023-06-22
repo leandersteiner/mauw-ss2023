@@ -21,7 +21,7 @@ export const CommentList = ({
     <>
       <Title level={4}>Comments</Title>
       {comments
-        ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         .map(comment => (
           <Comment
             key={comment.id}
@@ -32,6 +32,7 @@ export const CommentList = ({
         ))}
       <Divider />
       <AddNewItem onAdd={onCommentCreated} toggleButtonText='Add Comment' />
+      <Divider />
     </>
   );
 };

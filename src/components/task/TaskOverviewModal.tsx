@@ -23,7 +23,7 @@ export const TaskOverviewModal = ({
       open={isOpen}
       width='80%'
       onCancel={close}
-      style={{ maxWidth: '900px', top: 16 }}
+      style={{ maxWidth: '1100px', top: 16 }}
       footer={[
         <Button key='done' type='primary' onClick={close}>
           Done
