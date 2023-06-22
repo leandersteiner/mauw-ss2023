@@ -7,11 +7,20 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 
 type EditableMarkdownProps = {
+  editBtnText: string;
+  saveBtnText: string;
+  canEdit: boolean;
   text: string;
   onSave: (markdown: string) => void;
 };
 
-export const EditableMarkdown = ({ text, onSave }: EditableMarkdownProps) => {
+export const EditableMarkdown = ({
+  text,
+  canEdit,
+  onSave,
+  editBtnText,
+  saveBtnText
+}: EditableMarkdownProps) => {
   const [edit, setEdit] = useState(false);
   const [markdown, setMarkdown] = useState(text);
 
@@ -30,15 +39,17 @@ export const EditableMarkdown = ({ text, onSave }: EditableMarkdownProps) => {
           children={markdown}
         />
       )}
-      <Button
-        icon={edit ? <SaveOutlined /> : <EditOutlined />}
-        onClick={() => {
-          setEdit(!edit);
-          onSave(markdown);
-        }}
-      >
-        {edit ? 'Save' : 'Edit'}
-      </Button>
+      {canEdit && (
+        <Button
+          icon={edit ? <SaveOutlined /> : <EditOutlined />}
+          onClick={() => {
+            setEdit(!edit);
+            onSave(markdown);
+          }}
+        >
+          {edit ? saveBtnText : editBtnText}
+        </Button>
+      )}
     </>
   );
 };

@@ -4,7 +4,6 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { Task } from '../../models/task/Task';
-import { SubtaskList } from './SubtaskList';
 import { CommentList } from './CommentList';
 import {
   CommentResponse,
@@ -23,15 +22,15 @@ import { Subtask } from '../../models/task/Subtask';
 import { TaskComment } from '../../models/task/TaskComment';
 import { EditableMarkdown } from './EditableMarkdown';
 import { getProjectMember } from '../../api/projectsApi';
+import { SubtaskList } from './SubtaskList';
 
 type TaskOverviewProps = {
-  close: () => void;
   task: Task;
   onTaskDeleted: (taskId: string, columnId: string | null) => void;
   onTaskEdited: (taskId: string, task: Task) => void;
 };
 
-export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskOverviewProps) => {
+export const TaskOverview = ({ task, onTaskDeleted, onTaskEdited }: TaskOverviewProps) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data, isLoading, isError } = useQuery({
@@ -41,7 +40,7 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   const createSubtaskMutation = useMutation<SubtaskResponse, Error, CreateSubtaskRequest>({
     mutationFn: createSubtask(task.id),
     onSuccess: subtask => {
-      queryClient.invalidateQueries(['board']);
+      queryClient.invalidateQueries(['board']).then(() => {});
       task.subtasks.push(subtask);
     }
   });
@@ -59,7 +58,7 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   const createCommentMutation = useMutation<CommentResponse, Error, CreateCommentRequest>({
     mutationFn: createComment(task.id),
     onSuccess: comment => {
-      queryClient.invalidateQueries(['board']);
+      queryClient.invalidateQueries(['board']).then(() => {});
       task.comments.push(comment);
     }
   });
@@ -150,15 +149,13 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
             Description
           </Title>
           <EditableMarkdown
+            editBtnText='Edit Description'
+            saveBtnText='Save Description'
+            canEdit
             text={task.description}
             onSave={text => handleTaskUpdated({ ...task, description: text })}
           />
-          <SubtaskList
-            tasks={task.subtasks}
-            onSubtaskCreated={handleSubtaskCreated}
-            onSubtaskDeleted={handleSubtaskDeleted}
-            onSubtaskUpdated={handleSubtaskUpdated}
-          />
+          <Divider />
           <CommentList
             comments={task.comments}
             onCommentCreated={handleCommentCreated}
@@ -168,9 +165,13 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
         </Col>
         <Col sm={24} lg={8}>
           <Space direction='vertical' style={{ width: '100%' }}>
-            <Title level={4} style={{ marginTop: 0 }}>
-              Add
-            </Title>
+            <SubtaskList
+              tasks={task.subtasks}
+              onSubtaskCreated={handleSubtaskCreated}
+              onSubtaskDeleted={handleSubtaskDeleted}
+              onSubtaskUpdated={handleSubtaskUpdated}
+            />
+            <Title level={4}>Assignee</Title>
             <Select
               style={{ width: '100%' }}
               showSearch
@@ -184,9 +185,8 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
               }
               options={data.map(user => ({ value: user.id, label: user.username }))}
             />
-            <Title level={4} style={{ marginTop: 0 }}>
-              Actions
-            </Title>
+            <Divider style={{ marginBottom: 0 }} />
+            <Title level={4}>Actions</Title>
             <Popconfirm
               title='Delete Task'
               description='Are you sure you want to delete this task?'
@@ -200,6 +200,7 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
                 Delete Task
               </Button>
             </Popconfirm>
+            <Divider />
           </Space>
         </Col>
       </Row>

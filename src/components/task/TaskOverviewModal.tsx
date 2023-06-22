@@ -23,19 +23,14 @@ export const TaskOverviewModal = ({
       open={isOpen}
       width='80%'
       onCancel={close}
-      style={{ maxWidth: '900px', top: 16 }}
+      style={{ maxWidth: '1100px', top: 16 }}
       footer={[
         <Button key='done' type='primary' onClick={close}>
           Done
         </Button>
       ]}
     >
-      <TaskOverview
-        task={task}
-        close={() => close}
-        onTaskEdited={onTaskEdited}
-        onTaskDeleted={onTaskDeleted}
-      />
+      <TaskOverview task={task} onTaskEdited={onTaskEdited} onTaskDeleted={onTaskDeleted} />
     </Modal>
   );
 };

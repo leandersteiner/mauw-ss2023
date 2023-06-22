@@ -27,8 +27,7 @@ export const BoardView = () => {
   useEffect(() => {
     boardQuery.remove();
     backlogQuery.remove();
-    boardQuery.refetch();
-    backlogQuery.refetch();
+    Promise.all([boardQuery.refetch(), backlogQuery.refetch()]);
   }, [orgId, teamId, projectId]);
 
   if (!projectId || !teamId || !projectId || !orgId || !user) return <Navigate to='/home' />;

@@ -58,6 +58,9 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
       }
     >
       <EditableMarkdown
+        canEdit={user.id === comment.creator.id}
+        editBtnText='Edit Comment'
+        saveBtnText='Save Comment'
         text={comment.comment}
         onSave={text => onCommentUpdated(comment.id, { ...comment, comment: text })}
       />
