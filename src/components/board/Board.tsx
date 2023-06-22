@@ -253,15 +253,18 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
   };
 
   const handleTaskEdited = (taskId: string, task: Task) => {
-    board.columns.forEach((column, index) =>
-      column.tasks.forEach((t, i) => {
-        if (t.id === taskId) {
-          board.columns[index].tasks[i] = task;
-          setBoard({ ...board });
-          updateTaskMutation.mutate(task);
-        }
-      })
-    );
+    updateTaskMutation.mutate(task, {
+      onSuccess: task => {
+        board.columns.forEach((column, index) =>
+          column.tasks.forEach((t, i) => {
+            if (t.id === taskId) {
+              board.columns[index].tasks[i] = task;
+              setBoard({ ...board });
+            }
+          })
+        );
+      }
+    });
   };
 
   const handleTaskDeleted = (taskId: string, columnId: string | null) => {
@@ -355,8 +358,8 @@ export const Board = ({ projectId, board: model, backlog: b, user }: BoardProps)
               id={BACKLOG_ID}
               title='Backlog'
             />
-            {board.columns
-              .sort((a, b) => a.position - b.position)
+            {board?.columns
+              ?.sort((a, b) => a.position - b.position)
               .map(column => (
                 <Draggable
                   key={column.id}

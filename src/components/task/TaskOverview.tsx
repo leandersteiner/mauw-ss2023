@@ -112,6 +112,7 @@ export const TaskOverview = ({ close, task, onTaskDeleted, onTaskEdited }: TaskO
   };
 
   const handleTaskUpdated = (updatedTask: Task) => {
+    console.log(updatedTask);
     onTaskEdited(task.id, { ...updatedTask });
   };
 
