@@ -88,3 +88,13 @@ export const deleteComment = (taskId: string) => (commentId: string) =>
     .delete<void>(`/tasks/${taskId}/comments/${commentId}`)
     .then(res => res.data)
     .catch(reason => reason);
+
+export const TaskApi = {
+  create: createTask,
+  update: updateTask,
+  delete: deleteTask
+};
+
+export const TaskStateApi = {
+  create: createTaskState
+};

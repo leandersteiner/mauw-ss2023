@@ -1,19 +1,17 @@
 import { Space } from 'antd';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
-import { QueryObserverSuccessResult, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BoardColumn } from './BoardColumn';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { AddNewItem } from './AddNewItem';
 import {
-  BacklogTasksResponse,
-  createTask,
-  CreateTaskRequest,
   createTaskState,
   CreateTaskStateRequest,
-  deleteTask,
+  TaskApi,
   TaskResponse,
+  TaskStateApi,
   TaskStateResponse,
   updateTask
 } from '../../api/taskApi';
@@ -28,56 +26,63 @@ import {
   updateBoardColumn,
   UpdateBoardColumnRequest
 } from '../../api/boardApi';
-import { User } from '../../models/user/User';
 import { NotFound } from '../../views/NotFound';
 import { BACKLOG_ID } from '../../constants/board';
 import { useBoard } from '../../context/BoardContext';
+import { BacklogColumn } from './BacklogColumn';
+import { BoardColumn as BoardColumnModel } from '../../models/board/BoardColumn';
 
 const parseDndId = (dndId: string) => dndId.split(':')[1];
 
 type BoardProps = {
-  board: QueryObserverSuccessResult<BoardModel, Error>;
-  backlog: QueryObserverSuccessResult<BacklogTasksResponse, Error>;
-  user: User;
+  board: BoardModel;
+  backlog: Task[];
 };
 
-export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
-  const queryClient = useQueryClient();
-  const [board, setBoard] = useState<BoardModel>(model.data);
-  const [backlog, setBacklog] = useState<Task[]>(b.data);
+export const Board = ({ board: model, backlog: b }: BoardProps) => {
+  const [board, setBoard] = useState<BoardModel>(model);
+  const [backlog, setBacklog] = useState<Task[]>(b);
   const [dragging, setDragging] = useState(false);
   const { projectId } = useBoard();
 
-  const updateTaskMutation = useMutation<TaskResponse, Error, Task>({
-    mutationFn: updateTask(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
+  const { mutate: updateTask } = useMutation<TaskResponse, Error, Task>({
+    mutationFn: TaskApi.update(projectId)
   });
-  const updateColumnMutation = useMutation<BoardColumnResponse, Error, UpdateBoardColumnRequest>({
-    mutationFn: updateBoardColumn(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
+
+  const { mutate: updateColumn } = useMutation<
+    BoardColumnResponse,
+    Error,
+    UpdateBoardColumnRequest
+  >({
+    mutationFn: updateBoardColumn(projectId)
   });
-  const createColumnMutation = useMutation<BoardColumnResponse, Error, CreateBoardColumnRequest>({
-    mutationFn: createBoardColumn(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
+
+  const { mutate: createColumn } = useMutation<
+    BoardColumnResponse,
+    Error,
+    CreateBoardColumnRequest
+  >({
+    mutationFn: createBoardColumn(projectId)
   });
-  const createTaskStateMutation = useMutation<TaskStateResponse, Error, CreateTaskStateRequest>({
-    mutationFn: createTaskState(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
-  });
-  const createTaskMutation = useMutation<TaskResponse, Error, CreateTaskRequest>({
-    mutationFn: createTask(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
-  });
-  const deleteTaskMutation = useMutation<void, Error, string>({
-    mutationFn: deleteTask(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board', 'backlog'])
-  });
-  const deleteColumnMutation = useMutation<void, Error, string>({
-    mutationFn: deleteBoardColumn(projectId),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
+
+  const { mutate: createTaskState } = useMutation<TaskStateResponse, Error, CreateTaskStateRequest>(
+    {
+      mutationFn: TaskStateApi.create(projectId)
+    }
+  );
+
+  const { mutate: deleteColumn } = useMutation<void, Error, string>({
+    mutationFn: deleteBoardColumn(projectId)
   });
 
   if (!model) return <NotFound />;
+
+  const handleColumnUpdated = (column: BoardColumnModel) => {
+    setBoard({
+      ...board,
+      columns: reorder([...board.columns.filter(col => col.id !== column.id), column])
+    });
+  };
 
   const handleCardMoved = (taskId: string, columnId: string, index: number) => {
     const toBacklog = columnId === BACKLOG_ID;
@@ -90,7 +95,7 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
       if (toBacklog) {
         moveInList(backlog, movedTask.position, index);
         setBacklog([...backlog]);
-        backlog.forEach(task => updateTaskMutation.mutate(task));
+        backlog.forEach(task => updateTask(task));
       } else {
         movedTask.boardColumnId = columnId;
         const newColumn = board.columns.find(column => column.id === columnId);
@@ -106,8 +111,8 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
         newColumn.tasks = newDestination;
         setBacklog([...newSource]);
         setBoard({ ...board });
-        backlog.forEach(task => updateTaskMutation.mutate(task));
-        newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+        backlog.forEach(task => updateTask(task));
+        newColumn.tasks.forEach(task => updateTask(task));
       }
       return;
     }
@@ -132,9 +137,8 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
       movedTask.taskStateId = null;
       setBacklog([...newDestination]);
       setBoard({ ...board });
-      oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
-      backlog.forEach(task => updateTaskMutation.mutate(task));
-      return;
+      oldColumn.tasks.forEach(task => updateTask(task));
+      backlog.forEach(task => updateTask(task));
     }
 
     const oldColumn = board.columns.find(column => {
@@ -149,9 +153,7 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
     if (oldColumn.id === newColumn.id) {
       moveInList(oldColumn.tasks, movedTask.position, index);
       setBoard({ ...board });
-      board.columns.forEach(column =>
-        updateColumnMutation.mutate({ columnId: column.id, data: column })
-      );
+      oldColumn.tasks.forEach(task => updateTask(task));
     } else {
       movedTask.boardColumnId = columnId;
       const { newSource, newDestination } = moveTaskBetweenColumns(
@@ -164,9 +166,8 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
       );
       oldColumn.tasks = newSource;
       newColumn.tasks = newDestination;
-      setBoard({ ...board });
-      oldColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
-      newColumn.tasks.forEach(task => updateTaskMutation.mutate(task));
+      oldColumn.tasks.forEach(task => updateTask(task));
+      newColumn.tasks.forEach(task => updateTask(task));
     }
   };
 
@@ -174,10 +175,7 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
     const column = board.columns.find(column => column.id === id);
     if (!column) return;
     moveInList(board.columns, column.position, index);
-    setBoard({ ...board });
-    board.columns.forEach(column =>
-      updateColumnMutation.mutate({ columnId: column.id, data: column })
-    );
+    board.columns.forEach(column => updateColumn({ columnId: column.id, data: column }));
   };
 
   const handleDragStart = () => {
@@ -185,14 +183,14 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
   };
 
   const handleColumnCreated = (title: string) => {
-    createTaskStateMutation.mutate(
+    createTaskState(
       {
         name: title,
         projectId
       },
       {
         onSuccess: taskState => {
-          createColumnMutation.mutate(
+          createColumn(
             {
               title,
               position: board.columns.length + 1,
@@ -203,7 +201,6 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
               onSuccess: column => {
                 column.tasks = column.tasks ?? [];
                 board.columns.push(column);
-                setBoard({ ...board });
               }
             }
           );
@@ -211,107 +208,13 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
       }
     );
   };
-  const handleTaskCreated = (title: string, columnId: string) => {
-    const inBacklog = columnId === BACKLOG_ID;
-    if (inBacklog) {
-      const newTask: Partial<Task> = {
-        boardColumnId: null,
-        name: title,
-        description: '',
-        projectId,
-        creatorId: user.id,
-        done: false,
-        position: backlog.length + 1
-      };
-      createTaskMutation.mutate(
-        { columnId: null, data: newTask },
-        {
-          onSuccess: task => {
-            task.subtasks = task.subtasks ?? [];
-            setBacklog([...backlog, task]);
-          }
-        }
-      );
-    } else {
-      const column = board.columns.find(column => column.id === columnId);
-      if (!column) return;
-      const newTask: Partial<Task> = {
-        boardColumnId: columnId,
-        name: title,
-        description: '',
-        projectId,
-        creatorId: user.id,
-        done: false,
-        position: column.tasks.length + 1,
-        taskStateId: column.taskStateId
-      };
-      createTaskMutation.mutate(
-        { columnId, data: newTask },
-        {
-          onSuccess: task => {
-            task.subtasks = task.subtasks ?? [];
-            column.tasks.push(task);
-            setBoard({ ...board });
-          }
-        }
-      );
-    }
-  };
-
-  const handleTaskEdited = (taskId: string, task: Task) => {
-    updateTaskMutation.mutate(task, {
-      onSuccess: task => {
-        board.columns.forEach((column, index) =>
-          column.tasks.forEach((t, i) => {
-            if (t.id === taskId) {
-              board.columns[index].tasks[i] = task;
-              setBoard({ ...board });
-            }
-          })
-        );
-      }
-    });
-  };
-
-  const handleTaskDeleted = (taskId: string, columnId: string | null) => {
-    columnId = columnId ?? BACKLOG_ID;
-    const inBacklog = columnId === BACKLOG_ID;
-
-    if (inBacklog) {
-      const deletedTask = backlog.find(task => task.id === taskId);
-      if (!deletedTask) return;
-      setBacklog([...reorder(backlog.filter(task => task.id !== taskId))]);
-      deleteTaskMutation.mutate(taskId);
-      backlog.forEach(task => updateTaskMutation.mutate(task));
-    } else {
-      const column = board.columns.find(column => column.id === columnId);
-      if (!column) return;
-      const deletedTask = column.tasks.find(task => task.id === taskId);
-      if (!deletedTask) return;
-      const newTasks = column.tasks.filter(task => task.id !== deletedTask.id);
-      column.tasks = reorder(newTasks);
-      setBoard({ ...board });
-      deleteTaskMutation.mutate(deletedTask.id);
-      board.columns
-        .find(column => column.id === columnId)
-        ?.tasks.forEach(task => updateTaskMutation.mutate(task));
-    }
-  };
 
   const handleColumnDeleted = (columnId: string) => {
     const deletedColumn = board.columns.find(column => column.id === columnId);
     if (!deletedColumn) return;
     board.columns = board.columns.filter(column => column.id !== columnId);
     setBoard({ ...board });
-    deleteColumnMutation.mutate(columnId);
-  };
-
-  const handleColumnRenamed = (columnId: string, newTitle: string) => {
-    const renamedColumn = board.columns.find(column => column.id === columnId);
-    if (!renamedColumn) return;
-    renamedColumn.title = newTitle;
-    setBoard({ ...board });
-    updateColumnMutation.mutate({ columnId, data: renamedColumn });
+    deleteColumn(columnId);
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -354,48 +257,34 @@ export const Board = ({ board: model, backlog: b, user }: BoardProps) => {
             {...droppableProps}
             size='middle'
           >
-            <BoardColumn
-              onTaskCreated={handleTaskCreated}
-              onTaskDeleted={handleTaskDeleted}
-              onColumnDeleted={handleColumnDeleted}
-              onColumnRenamed={() => {}}
-              onTaskEdited={handleTaskEdited}
-              taskStateId=''
-              tasks={backlog}
-              id={BACKLOG_ID}
-              title='Backlog'
-            />
-            {board?.columns
-              ?.sort((a, b) => a.position - b.position)
-              .map(column => (
-                <Draggable
-                  key={column.id}
-                  draggableId={`column:${column.id}`}
-                  index={column.position}
-                  isDragDisabled={dragging}
-                >
-                  {provided => (
-                    <div
-                      key={column.id}
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <BoardColumn
-                        onTaskCreated={handleTaskCreated}
-                        onTaskDeleted={handleTaskDeleted}
-                        onColumnDeleted={handleColumnDeleted}
-                        onColumnRenamed={handleColumnRenamed}
-                        onTaskEdited={handleTaskEdited}
-                        taskStateId={column.taskStateId}
-                        tasks={column.tasks}
-                        id={column.id}
-                        title={column.title}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
+            <BacklogColumn tasks={backlog} updateTasks={setBacklog} />
+            {board.columns
+              .sort((a, b) => a.position - b.position)
+              .map(column => {
+                return (
+                  <Draggable
+                    key={column.id}
+                    draggableId={`column:${column.id}`}
+                    index={column.position}
+                    isDragDisabled={dragging}
+                  >
+                    {provided => (
+                      <div
+                        key={column.id}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <BoardColumn
+                          column={column}
+                          onColumnDeleted={handleColumnDeleted}
+                          onColumnUpdated={handleColumnUpdated}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
             {placeholder}
             <div style={{ width: '200px' }}>
               <AddNewItem onAdd={handleColumnCreated} toggleButtonText='Add column' />
