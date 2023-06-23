@@ -2,16 +2,24 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Button, Col, Popconfirm, Row, Space, Tooltip } from 'antd';
 import { DeleteFilled, QuestionCircleOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { BoardColumnTask } from './BoardColumnTask';
 import { AddNewItem } from './AddNewItem';
 import { Task } from '../../models/task/Task';
+import { BACKLOG_ID } from '../../constants/board';
+import {
+  BoardColumnResponse,
+  UpdateBoardColumnRequest,
+  updateBoardColumn
+} from '../../api/boardApi';
+import { useBoard } from '../../context/BoardContext';
 
 export type BoardColumnProps = {
   id: string;
   title: string;
-  index: number;
+  taskStateId: string;
   tasks: Task[];
   onTaskCreated: (title: string, columnId: string) => void;
   onTaskDeleted: (taskId: string, columnId: string | null) => void;
@@ -23,7 +31,6 @@ export type BoardColumnProps = {
 export const BoardColumn = ({
   id,
   title,
-  index,
   tasks,
   onTaskCreated,
   onTaskDeleted,
@@ -31,7 +38,19 @@ export const BoardColumn = ({
   onColumnDeleted,
   onColumnRenamed
 }: BoardColumnProps) => {
-  const isBacklog = id === 'backlog';
+  const queryClient = useQueryClient();
+  const { projectId } = useBoard();
+  const updateColumnMutation = useMutation<BoardColumnResponse, Error, UpdateBoardColumnRequest>({
+    mutationFn: updateBoardColumn(projectId),
+    onSuccess: () => queryClient.invalidateQueries(['board'])
+  });
+
+  const isBacklog = id === BACKLOG_ID;
+
+  const handleColumnRenamed = (newTitle: string) => {
+    title = newTitle;
+  };
+
   const tasksNode = (
     <Space direction='vertical' style={{ width: '100%' }}>
       {tasks

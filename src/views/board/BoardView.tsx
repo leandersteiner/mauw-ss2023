@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
 import { BoardResponse, getBoard } from '../../api/boardApi';
 import { BacklogTasksResponse, getBacklogTasks } from '../../api/taskApi';
+import { BoardContextProvier } from '../../context/BoardContext';
 
 export const BoardView = () => {
   const { orgId, teamId, projectId } = useParams();
@@ -15,12 +16,12 @@ export const BoardView = () => {
   const { setPath } = usePathContext();
   useEffect(() => setPath('board'));
   const boardQuery = useQuery<BoardResponse, Error>({
-    queryKey: ['board', projectId],
+    queryKey: ['board', projectId, teamId, orgId],
     queryFn: () => getBoard(projectId ?? '')
   });
 
   const backlogQuery = useQuery<BacklogTasksResponse, Error>({
-    queryKey: ['backlog', projectId],
+    queryKey: ['backlog', projectId, teamId, orgId],
     queryFn: () => getBacklogTasks(projectId ?? '')
   });
 
@@ -28,7 +29,9 @@ export const BoardView = () => {
     boardQuery.remove();
     backlogQuery.remove();
     Promise.all([boardQuery.refetch(), backlogQuery.refetch()]);
-  }, [orgId, teamId, projectId]);
+    // We only want this to do a full refetch if we move projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, teamId, orgId]);
 
   if (!projectId || !teamId || !projectId || !orgId || !user) return <Navigate to='/home' />;
 
@@ -45,11 +48,14 @@ export const BoardView = () => {
   if (boardQuery.isError || backlogQuery.isError) {
     return (
       <div>
-        There was an unexpected error: {boardQuery.error?.message}
-        {backlogQuery.error?.message}
+        {`There was an unexpected error: ${boardQuery.error?.message}${backlogQuery.error?.message}`}
       </div>
     );
   }
 
-  return <Board projectId={projectId} board={boardQuery} backlog={backlogQuery} user={user} />;
+  return (
+    <BoardContextProvier userId={user.id} orgId={orgId} teamId={teamId} projectId={projectId}>
+      <Board board={boardQuery} backlog={backlogQuery} user={user} />
+    </BoardContextProvier>
+  );
 };
