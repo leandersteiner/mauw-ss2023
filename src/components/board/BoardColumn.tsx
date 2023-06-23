@@ -2,55 +2,112 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Button, Col, Popconfirm, Row, Space, Tooltip } from 'antd';
 import { DeleteFilled, QuestionCircleOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { BoardColumnTask } from './BoardColumnTask';
 import { AddNewItem } from './AddNewItem';
 import { Task } from '../../models/task/Task';
+import { useBoard } from '../../context/BoardContext';
+import { TaskApi } from '../../api/taskApi';
+import { reorder } from '../../helpers/drag';
+import { BoardColumn as BoardColumnModel } from '../../models/board/BoardColumn';
+import { BoardColumnApi } from '../../api/boardApi';
 
 export type BoardColumnProps = {
-  id: string;
-  title: string;
-  index: number;
-  tasks: Task[];
-  onTaskCreated: (title: string, columnId: string) => void;
-  onTaskDeleted: (taskId: string, columnId: string | null) => void;
-  onTaskEdited: (taskId: string, task: Task) => void;
+  column: BoardColumnModel;
   onColumnDeleted: (columnId: string) => void;
-  onColumnRenamed: (columnId: string, newTitle: string) => void;
+  onColumnUpdated: (column: BoardColumnModel) => void;
 };
 
-export const BoardColumn = ({
-  id,
-  title,
-  index,
-  tasks,
-  onTaskCreated,
-  onTaskDeleted,
-  onTaskEdited,
-  onColumnDeleted,
-  onColumnRenamed
-}: BoardColumnProps) => {
-  const isBacklog = id === 'backlog';
+export const BoardColumn = (props: BoardColumnProps) => {
+  const [column, setColumn] = useState(props.column);
+  const { id, title, tasks, taskStateId } = column;
+  const { onColumnDeleted, onColumnUpdated } = props;
+  const { projectId, userId } = useBoard();
+
+  useEffect(() => {
+    setColumn(props.column);
+  }, [props.column]);
+
+  const { mutate: createTask } = useMutation(TaskApi.create(projectId));
+  const { mutate: updateTask } = useMutation(TaskApi.update(projectId));
+  const { mutate: deleteTask } = useMutation(TaskApi.delete(projectId));
+  const { mutate: updateColumn } = useMutation(BoardColumnApi.update(projectId));
+
+  const handleTaskCreated = (title: string) => {
+    createTask(
+      {
+        columnId: id,
+        data: {
+          boardColumnId: id,
+          name: title,
+          description: '',
+          projectId,
+          creatorId: userId,
+          done: false,
+          position: tasks.length + 1,
+          taskStateId
+        }
+      },
+      {
+        onSuccess: task => {
+          task.subtasks = task.subtasks ?? [];
+          onColumnUpdated({ ...column, tasks: [...tasks, task] });
+        }
+      }
+    );
+  };
+
+  const handleTaskUpdated = (taskId: string, task: Task) => {
+    updateTask(task, {
+      onSuccess: task => {
+        tasks.forEach((t, i) => {
+          if (t.id === taskId) {
+            tasks[i] = task;
+            setColumn({ ...column, tasks: [...tasks] });
+            onColumnUpdated(column);
+          }
+        });
+      }
+    });
+  };
+
+  const handleTaskDeleted = (taskId: string) => {
+    const deletedTask = tasks.find(task => task.id === taskId);
+    if (!deletedTask) return;
+    deleteTask(taskId);
+    tasks.forEach(task => updateTask(task));
+    onColumnUpdated({ ...column, tasks: [...reorder(tasks.filter(task => task.id !== taskId))] });
+  };
+
+  const handleColumnRenamed = (title: string) => {
+    updateColumn({ columnId: id, data: { ...column, title } });
+    onColumnUpdated({ ...column, title });
+  };
+
   const tasksNode = (
     <Space direction='vertical' style={{ width: '100%' }}>
       {tasks
         .sort((a, b) => a.position - b.position)
-        .map(task => (
-          <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
-            {({ innerRef, draggableProps, dragHandleProps }) => (
-              <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
-                <BoardColumnTask
-                  id={task.id}
-                  columnId={id}
-                  task={task}
-                  onTaskDeleted={onTaskDeleted}
-                  onTaskEdited={onTaskEdited}
-                />
-              </div>
-            )}
-          </Draggable>
-        ))}
+        .map(task => {
+          return (
+            <Draggable key={task.id} draggableId={`task:${task.id}`} index={task.position}>
+              {({ innerRef, draggableProps, dragHandleProps }) => (
+                <div {...draggableProps} {...dragHandleProps} ref={innerRef}>
+                  <BoardColumnTask
+                    id={task.id}
+                    columnId={id}
+                    task={task}
+                    onTaskDeleted={handleTaskDeleted}
+                    onTaskEdited={handleTaskUpdated}
+                  />
+                </div>
+              )}
+            </Draggable>
+          );
+        })}
     </Space>
   );
 
@@ -75,11 +132,10 @@ export const BoardColumn = ({
                 level={4}
                 style={{ margin: 0, width: '225px' }}
                 editable={{
-                  triggerType: isBacklog ? [] : ['text'],
+                  triggerType: ['text'],
                   onChange: text => {
-                    title = text;
-                  },
-                  onEnd: () => onColumnRenamed(id, title)
+                    handleColumnRenamed(text);
+                  }
                 }}
                 ellipsis={{ rows: 1 }}
               >
@@ -108,7 +164,7 @@ export const BoardColumn = ({
             {tasksNode}
             {placeholder}
           </div>
-          <AddNewItem onAdd={text => onTaskCreated(text, id)} toggleButtonText='Add Task' />
+          <AddNewItem onAdd={text => handleTaskCreated(text)} toggleButtonText='Add Task' />
         </Space>
       )}
     </StrictModeDroppable>

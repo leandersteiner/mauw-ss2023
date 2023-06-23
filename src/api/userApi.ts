@@ -5,12 +5,18 @@ export type UserResponse = User;
 
 type UpdateUserRequest = Partial<User>;
 
-export const getUser = (userId: string) =>
-  api.get<UserResponse>(`users/${userId}`).then(res => res.data);
+const getUser = (userId: string) => api.get<UserResponse>(`users/${userId}`).then(res => res.data);
 
-export const getAllUsers = () => api.get<User[]>('users').then(res => res.data);
+const getAllUsers = () => api.get<User[]>('users').then(res => res.data);
 
-export const updateUser = (userId: string) => (data: UpdateUserRequest) =>
+const updateUser = (userId: string) => (data: UpdateUserRequest) =>
   api.patch<UserResponse>(`users/${userId}`, data).then(res => res.data);
 
-export const deleteUser = (userId: string) => api.delete(`users/${userId}`);
+const deleteUser = (userId: string) => api.delete(`users/${userId}`);
+
+export const UserApi = {
+  get: getUser,
+  all: getAllUsers,
+  update: updateUser,
+  delete: deleteUser
+};

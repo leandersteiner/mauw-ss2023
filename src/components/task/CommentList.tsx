@@ -8,7 +8,7 @@ type CommentListProps = {
   comments: TaskComment[];
   onCommentCreated: (comment: string) => void;
   onCommentDeleted: (commentId: string) => void;
-  onCommentUpdated: (commentId: string, comment: TaskComment) => void;
+  onCommentUpdated: (comment: TaskComment) => void;
 };
 
 export const CommentList = ({

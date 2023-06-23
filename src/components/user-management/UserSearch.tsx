@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-query';
 import Search from 'antd/es/input/Search';
 import { CSSProperties, useEffect, useState } from 'react';
-import { getAllUsers } from '../../api/userApi';
+import { UserApi } from '../../api/userApi';
 import { User } from '../../models/user/User';
 import { UserSearchResult } from './UserSearchResult';
 
@@ -48,7 +48,7 @@ export const UserSearch: React.FC<UserSearchResultProps> = (props: UserSearchRes
 
   const { isLoading, isError, error, data, refetch } = useQuery<User[], Error>({
     queryKey: ['users'],
-    queryFn: getAllUsers,
+    queryFn: UserApi.all,
     enabled: false
   });
 

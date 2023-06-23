@@ -6,33 +6,29 @@ import { Space, Spin } from 'antd';
 import { Board } from '../../components/board/Board';
 import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
-import { BoardResponse, getBoard } from '../../api/boardApi';
-import { BacklogTasksResponse, getBacklogTasks } from '../../api/taskApi';
+import { BoardApi } from '../../api/boardApi';
+import { TaskApi } from '../../api/taskApi';
+import { BoardContextProvier } from '../../context/BoardContext';
 
 export const BoardView = () => {
   const { orgId, teamId, projectId } = useParams();
   const { user } = useAuth();
   const { setPath } = usePathContext();
   useEffect(() => setPath('board'));
-  const boardQuery = useQuery<BoardResponse, Error>({
-    queryKey: ['board', projectId],
-    queryFn: () => getBoard(projectId ?? '')
-  });
 
-  const backlogQuery = useQuery<BacklogTasksResponse, Error>({
-    queryKey: ['backlog', projectId],
-    queryFn: () => getBacklogTasks(projectId ?? '')
-  });
+  const board = useQuery(['board', projectId, teamId, orgId], () => BoardApi.get(projectId ?? ''));
+  const backlog = useQuery(['backlog'], () => TaskApi.getBacklog(projectId ?? ''));
 
   useEffect(() => {
-    boardQuery.remove();
-    backlogQuery.remove();
-    Promise.all([boardQuery.refetch(), backlogQuery.refetch()]);
-  }, [orgId, teamId, projectId]);
+    board.remove();
+    backlog.remove();
+    // We only want this to do a full refetch if we move projects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, teamId, orgId]);
 
   if (!projectId || !teamId || !projectId || !orgId || !user) return <Navigate to='/home' />;
 
-  if (boardQuery.isLoading || backlogQuery.isLoading) {
+  if (backlog.isLoading || board.isLoading) {
     return (
       <Space direction='vertical' style={{ width: '100%' }}>
         <Spin tip='Loading' size='large'>
@@ -42,14 +38,13 @@ export const BoardView = () => {
     );
   }
 
-  if (boardQuery.isError || backlogQuery.isError) {
-    return (
-      <div>
-        There was an unexpected error: {boardQuery.error?.message}
-        {backlogQuery.error?.message}
-      </div>
-    );
+  if (backlog.isError || board.isError) {
+    return <div>{`There was an unexpected error}`}</div>;
   }
 
-  return <Board projectId={projectId} board={boardQuery} backlog={backlogQuery} user={user} />;
+  return (
+    <BoardContextProvier userId={user.id} orgId={orgId} teamId={teamId} projectId={projectId}>
+      <Board board={board.data} backlog={backlog.data} />
+    </BoardContextProvier>
+  );
 };
