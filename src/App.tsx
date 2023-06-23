@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
@@ -33,6 +33,7 @@ export const App: React.FC = () => {
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<Overview />}>
+              <Route path='' element={<Navigate to='/home' />} />
               <Route path='home' element={<HomePage />} />
               <Route
                 path='profile'
