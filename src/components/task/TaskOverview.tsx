@@ -5,18 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { Task } from '../../models/task/Task';
 import { CommentList } from './CommentList';
-import {
-  CommentResponse,
-  createComment,
-  CreateCommentRequest,
-  createSubtask,
-  CreateSubtaskRequest,
-  deleteComment,
-  deleteSubtask,
-  SubtaskResponse,
-  updateComment,
-  updateSubtask
-} from '../../api/taskApi';
+import { CommentApi, SubtaskApi } from '../../api/taskApi';
 import { useAuth } from '../../context/AuthContext';
 import { Subtask } from '../../models/task/Subtask';
 import { TaskComment } from '../../models/task/TaskComment';
@@ -37,41 +26,17 @@ export const TaskOverview = ({ task, onTaskDeleted, onTaskEdited }: TaskOverview
     queryKey: ['members'],
     queryFn: () => getProjectMember(task.projectId)
   });
-  const createSubtaskMutation = useMutation<SubtaskResponse, Error, CreateSubtaskRequest>({
-    mutationFn: createSubtask(task.id),
-    onSuccess: subtask => {
-      queryClient.invalidateQueries(['board']).then(() => {});
-      task.subtasks.push(subtask);
-    }
+  const { mutate: createSubtask } = useMutation(SubtaskApi.create(task.id), {
+    onSuccess: subtask => task.subtasks.push(subtask)
   });
+  const { mutate: updateSubtask } = useMutation(SubtaskApi.update(task.id));
+  const { mutate: deleteSubtask } = useMutation(SubtaskApi.delete(task.id));
 
-  const updateSubtaskMutation = useMutation<SubtaskResponse, Error, CreateSubtaskRequest>({
-    mutationFn: updateSubtask(task.id),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
+  const { mutate: createComment } = useMutation(CommentApi.create(task.id), {
+    onSuccess: comment => task.comments.push(comment)
   });
-
-  const deleteSubtaskMutation = useMutation<void, Error, string>({
-    mutationFn: deleteSubtask(task.id),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
-  });
-
-  const createCommentMutation = useMutation<CommentResponse, Error, CreateCommentRequest>({
-    mutationFn: createComment(task.id),
-    onSuccess: comment => {
-      queryClient.invalidateQueries(['board']).then(() => {});
-      task.comments.push(comment);
-    }
-  });
-
-  const updateCommentMutation = useMutation<CommentResponse, Error, CreateCommentRequest>({
-    mutationFn: updateComment(task.id),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
-  });
-
-  const deleteCommentMutation = useMutation<void, Error, string>({
-    mutationFn: deleteComment(task.id),
-    onSuccess: () => queryClient.invalidateQueries(['board'])
-  });
+  const { mutate: updateComment } = useMutation(CommentApi.update(task.id));
+  const { mutate: deleteComment } = useMutation(CommentApi.delete(task.id));
 
   if (!user) return <Navigate to='/login' />;
 
@@ -90,24 +55,24 @@ export const TaskOverview = ({ task, onTaskDeleted, onTaskEdited }: TaskOverview
   }
 
   const handleSubtaskCreated = (title: string) => {
-    createSubtaskMutation.mutate({ name: title, done: false });
+    createSubtask({ name: title, done: false });
   };
 
-  const handleSubtaskUpdated = (subtaskId: string, subtask: Subtask) => {
-    updateSubtaskMutation.mutate(subtask);
+  const handleSubtaskUpdated = (subtask: Subtask) => {
+    updateSubtask(subtask);
   };
 
   const handleSubtaskDeleted = (subtaskId: string) => {
     task.subtasks = task.subtasks.filter(subtask => subtask.id !== subtaskId);
-    deleteSubtaskMutation.mutate(subtaskId);
+    deleteSubtask(subtaskId);
   };
 
   const handleCommentCreated = (comment: string) => {
-    createCommentMutation.mutate({ comment });
+    createComment({ comment });
   };
 
-  const handleCommentUpdated = (commentId: string, comment: TaskComment) => {
-    updateCommentMutation.mutate(comment);
+  const handleCommentUpdated = (comment: TaskComment) => {
+    updateComment(comment);
   };
 
   const handleTaskUpdated = (updatedTask: Task) => {
@@ -116,7 +81,7 @@ export const TaskOverview = ({ task, onTaskDeleted, onTaskEdited }: TaskOverview
 
   const handleCommentDeleted = (commentId: string) => {
     task.comments = task.comments.filter(comment => comment.id !== commentId);
-    deleteCommentMutation.mutate(commentId);
+    deleteComment(commentId);
   };
 
   const onChange = (value: string) => {

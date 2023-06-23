@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, notification } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { AuthResponse, loginUser } from '../../api/authApi';
+import { AuthApi } from '../../api/authApi';
 import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
 
@@ -15,7 +15,7 @@ type LoginFormData = {
 export const LoginForm = () => {
   const { onLogin, token } = useAuth();
   const navigate = useNavigate();
-  const createLoginMutation = useMutation(loginUser);
+  const { mutate: login } = useMutation(AuthApi.login);
   const { setPath } = usePathContext();
   const [api, contextHolder] = notification.useNotification();
 
@@ -24,20 +24,19 @@ export const LoginForm = () => {
   if (token) return <Navigate to='/home' replace />;
 
   const onFinish = async (data: LoginFormData) => {
-    createLoginMutation.mutate(data, {
-      onSuccess: (response: AuthResponse) => {
+    login(data, {
+      onSuccess: response => {
         onLogin(response.user, response.token);
         Promise.resolve().then(() => {
           api.success({
-            message: 'LoginForm successful',
-            description: 'Please check your username and password'
+            message: 'Login successful'
           });
         });
         navigate('/home');
       },
       onError: () => {
         api.error({
-          message: 'LoginForm failed',
+          message: 'Login failed',
           description: 'Please check your username and password'
         });
       }

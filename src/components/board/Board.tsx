@@ -6,26 +6,11 @@ import { BoardColumn } from './BoardColumn';
 import { DroppableTypes } from '../../constants/DroppableTypes';
 import { StrictModeDroppable } from '../dnd/StrictModeDroppable';
 import { AddNewItem } from './AddNewItem';
-import {
-  createTaskState,
-  CreateTaskStateRequest,
-  TaskApi,
-  TaskResponse,
-  TaskStateApi,
-  TaskStateResponse,
-  updateTask
-} from '../../api/taskApi';
+import { TaskApi, TaskStateApi } from '../../api/taskApi';
 import { Task } from '../../models/task/Task';
 import { Board as BoardModel } from '../../models/board/Board';
 import { moveInList, moveTaskBetweenColumns, reorder } from '../../helpers/drag';
-import {
-  BoardColumnResponse,
-  createBoardColumn,
-  CreateBoardColumnRequest,
-  deleteBoardColumn,
-  updateBoardColumn,
-  UpdateBoardColumnRequest
-} from '../../api/boardApi';
+import { BoardColumnApi } from '../../api/boardApi';
 import { NotFound } from '../../views/NotFound';
 import { BACKLOG_ID } from '../../constants/board';
 import { useBoard } from '../../context/BoardContext';
@@ -45,35 +30,11 @@ export const Board = ({ board: model, backlog: b }: BoardProps) => {
   const [dragging, setDragging] = useState(false);
   const { projectId } = useBoard();
 
-  const { mutate: updateTask } = useMutation<TaskResponse, Error, Task>({
-    mutationFn: TaskApi.update(projectId)
-  });
-
-  const { mutate: updateColumn } = useMutation<
-    BoardColumnResponse,
-    Error,
-    UpdateBoardColumnRequest
-  >({
-    mutationFn: updateBoardColumn(projectId)
-  });
-
-  const { mutate: createColumn } = useMutation<
-    BoardColumnResponse,
-    Error,
-    CreateBoardColumnRequest
-  >({
-    mutationFn: createBoardColumn(projectId)
-  });
-
-  const { mutate: createTaskState } = useMutation<TaskStateResponse, Error, CreateTaskStateRequest>(
-    {
-      mutationFn: TaskStateApi.create(projectId)
-    }
-  );
-
-  const { mutate: deleteColumn } = useMutation<void, Error, string>({
-    mutationFn: deleteBoardColumn(projectId)
-  });
+  const { mutate: updateTask } = useMutation(TaskApi.update(projectId));
+  const { mutate: updateColumn } = useMutation(BoardColumnApi.update(projectId));
+  const { mutate: createColumn } = useMutation(BoardColumnApi.create(projectId));
+  const { mutate: createTaskState } = useMutation(TaskStateApi.create(projectId));
+  const { mutate: deleteColumn } = useMutation(BoardColumnApi.delete(projectId));
 
   if (!model) return <NotFound />;
 

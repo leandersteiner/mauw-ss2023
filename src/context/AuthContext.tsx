@@ -1,5 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
-import { AxiosRequestConfig } from 'axios';
+import { createContext, ReactNode, useContext, useMemo } from 'react';
 import { User } from '../models/user/User';
 import { useSessionStorage } from '../hooks/useStorage';
 
@@ -8,15 +7,13 @@ interface AuthContextType {
   token: string | null;
   onLogin: (user: User, token: string) => void;
   onLogout: () => void;
-  authConfig: AxiosRequestConfig;
 }
 
 const defaultContext: AuthContextType = {
   user: null,
   token: null,
   onLogin: () => {},
-  onLogout: () => {},
-  authConfig: {}
+  onLogout: () => {}
 };
 
 const AuthContext = createContext<AuthContextType>(defaultContext);
@@ -30,17 +27,6 @@ type AuthProviderProps = {
 export const AuthContextProvider = (props: AuthProviderProps) => {
   const [user, setUser, removeUser] = useSessionStorage<User | null>('user', null);
   const [token, setToken, removeToken] = useSessionStorage<string | null>('token', null);
-  const [authConfig, setAuthConfig] = useState<AxiosRequestConfig>({});
-
-  useEffect(() => {
-    setAuthConfig({
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    });
-  }, [token]);
 
   const values = useMemo(
     () => ({
@@ -53,10 +39,9 @@ export const AuthContextProvider = (props: AuthProviderProps) => {
       onLogout: () => {
         removeToken();
         removeUser();
-      },
-      authConfig
+      }
     }),
-    [user, token, authConfig, setUser, setToken, removeToken, removeUser]
+    [user, token, setUser, setToken, removeToken, removeUser]
   );
 
   return <AuthContext.Provider value={values}>{props.children}</AuthContext.Provider>;

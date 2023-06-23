@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { User } from '../../models/user/User';
-import { updateUser, UserResponse } from '../../api/userApi';
+import { UserApi } from '../../api/userApi';
 
 type UpdateUserFormData = Partial<User>;
 
@@ -15,14 +15,13 @@ type UpdateUserFormProps = {
 
 export const UpdateUserForm = ({ token, user, onLogin }: UpdateUserFormProps) => {
   const navigate = useNavigate();
-  const { mutate } = useMutation({ mutationFn: updateUser(user.id) });
+  const { mutate: updateUser } = useMutation(UserApi.update(user.id));
 
   const onFinish = async (data: UpdateUserFormData) => {
-    await mutate(data, {
-      onSuccess: (response: UserResponse) => {
+    updateUser(data, {
+      onSuccess: response => {
         onLogin(response, token);
         navigate('/home');
-        // Todo: set current user show success notification
       }
     });
   };

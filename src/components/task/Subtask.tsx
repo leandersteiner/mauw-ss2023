@@ -5,7 +5,7 @@ import { Subtask as SubtaskModel } from '../../models/task/Subtask';
 
 type SubtaskProps = {
   task: SubtaskModel;
-  onSubtaskUpdated: (subtaskId: string, subtask: SubtaskModel) => void;
+  onSubtaskUpdated: (subtask: SubtaskModel) => void;
   onSubtaskDeleted: (subtaskId: string) => void;
 };
 export const Subtask = ({ task, onSubtaskUpdated, onSubtaskDeleted }: SubtaskProps) => {
@@ -30,7 +30,7 @@ export const Subtask = ({ task, onSubtaskUpdated, onSubtaskDeleted }: SubtaskPro
         onChange={() => {
           task.done = !checked;
           setChecked(!checked);
-          onSubtaskUpdated(task.id, task);
+          onSubtaskUpdated(task);
         }}
       >
         {task.name}

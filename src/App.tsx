@@ -16,13 +16,14 @@ import { RegistrationForm } from './components/auth/RegistrationForm';
 import { Logout } from './components/auth/Logout';
 import 'easymde/dist/easymde.min.css';
 import 'highlight.js/styles/a11y-dark.css';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: 2,
       refetchOnWindowFocus: true,
-      useErrorBoundary: true
+      useErrorBoundary: false
     }
   }
 });
@@ -35,10 +36,30 @@ export const App: React.FC = () => {
           <Routes>
             <Route path='/' element={<Overview />}>
               <Route path='home' element={<HomePage />} />
-              <Route path='profile' element={<Profile />} />
-              <Route path='projects' element={<Projects />} />
-              <Route path='orgs' element={<Organisations />} />
-              <Route path='settings' element={<Settings />} />
+              <Route
+                path='profile'
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='projects'
+                element={
+                  <ProtectedRoute>
+                    <Projects />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='orgs'
+                element={
+                  <ProtectedRoute>
+                    <Organisations />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
             <Route path='/auth' element={<Overview />}>
               <Route path='login' element={<LoginForm />} />
@@ -48,7 +69,11 @@ export const App: React.FC = () => {
             <Route path='' element={<Overview />}>
               <Route
                 path='/orgs/:orgId/teams/:teamId/projects/:projectId/board'
-                element={<BoardView />}
+                element={
+                  <ProtectedRoute>
+                    <BoardView />
+                  </ProtectedRoute>
+                }
               />
             </Route>
             <Route path='*' element={<Overview />}>

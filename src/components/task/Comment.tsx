@@ -11,7 +11,7 @@ const { Text } = Typography;
 type CommentProps = {
   comment: TaskComment;
   onCommentDeleted: (commentId: string) => void;
-  onCommentUpdated: (commentId: string, comment: TaskComment) => void;
+  onCommentUpdated: (comment: TaskComment) => void;
 };
 
 export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: CommentProps) => {
@@ -62,7 +62,7 @@ export const Comment = ({ comment, onCommentDeleted, onCommentUpdated }: Comment
         editBtnText='Edit Comment'
         saveBtnText='Save Comment'
         text={comment.comment}
-        onSave={text => onCommentUpdated(comment.id, { ...comment, comment: text })}
+        onSave={text => onCommentUpdated({ ...comment, comment: text })}
       />
     </Card>
   );

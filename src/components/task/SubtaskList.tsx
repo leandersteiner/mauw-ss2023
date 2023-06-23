@@ -7,7 +7,7 @@ import { AddNewItem } from '../board/AddNewItem';
 type SubtaskListProps = {
   tasks: SubtaskModel[];
   onSubtaskCreated: (title: string) => void;
-  onSubtaskUpdated: (subtaskId: string, subtask: SubtaskModel) => void;
+  onSubtaskUpdated: (subtask: SubtaskModel) => void;
   onSubtaskDeleted: (subtaskId: string) => void;
 };
 export const SubtaskList = ({

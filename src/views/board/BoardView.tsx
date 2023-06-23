@@ -6,31 +6,22 @@ import { Space, Spin } from 'antd';
 import { Board } from '../../components/board/Board';
 import { useAuth } from '../../context/AuthContext';
 import { usePathContext } from '../../context/PathContext';
-import { BoardResponse, getBoard } from '../../api/boardApi';
-import { getBacklogTasks } from '../../api/taskApi';
+import { BoardApi } from '../../api/boardApi';
+import { TaskApi } from '../../api/taskApi';
 import { BoardContextProvier } from '../../context/BoardContext';
-import { Task } from '../../models/task/Task';
 
 export const BoardView = () => {
   const { orgId, teamId, projectId } = useParams();
   const { user } = useAuth();
   const { setPath } = usePathContext();
   useEffect(() => setPath('board'));
-  const board = useQuery<BoardResponse, Error>({
-    queryKey: ['board', projectId, teamId, orgId],
-    queryFn: () => getBoard(projectId ?? '')
-  });
 
-  const backlog = useQuery<Task[], Error>({
-    queryKey: ['backlog'],
-    queryFn: () => getBacklogTasks(projectId ?? '')
-  });
+  const board = useQuery(['board', projectId, teamId, orgId], () => BoardApi.get(projectId ?? ''));
+  const backlog = useQuery(['backlog'], () => TaskApi.getBacklog(projectId ?? ''));
 
   useEffect(() => {
     board.remove();
     backlog.remove();
-    board.refetch();
-    backlog.refetch();
     // We only want this to do a full refetch if we move projects
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, teamId, orgId]);
@@ -48,9 +39,7 @@ export const BoardView = () => {
   }
 
   if (backlog.isError || board.isError) {
-    return (
-      <div>{`There was an unexpected error: ${backlog.error?.message}${board.error?.message}`}</div>
-    );
+    return <div>{`There was an unexpected error}`}</div>;
   }
 
   return (

@@ -10,14 +10,10 @@ import { BoardColumnTask } from './BoardColumnTask';
 import { AddNewItem } from './AddNewItem';
 import { Task } from '../../models/task/Task';
 import { useBoard } from '../../context/BoardContext';
-import { TaskResponse, CreateTaskRequest, TaskApi } from '../../api/taskApi';
+import { TaskApi } from '../../api/taskApi';
 import { reorder } from '../../helpers/drag';
 import { BoardColumn as BoardColumnModel } from '../../models/board/BoardColumn';
-import {
-  BoardColumnResponse,
-  UpdateBoardColumnRequest,
-  updateBoardColumn
-} from '../../api/boardApi';
+import { BoardColumnApi } from '../../api/boardApi';
 
 export type BoardColumnProps = {
   column: BoardColumnModel;
@@ -35,25 +31,10 @@ export const BoardColumn = (props: BoardColumnProps) => {
     setColumn(props.column);
   }, [props.column]);
 
-  const { mutate: createTask } = useMutation<TaskResponse, Error, CreateTaskRequest>({
-    mutationFn: TaskApi.create(projectId)
-  });
-
-  const { mutate: updateTask } = useMutation<TaskResponse, Error, Task>({
-    mutationFn: TaskApi.update(projectId)
-  });
-
-  const { mutate: deleteTask } = useMutation<void, Error, string>({
-    mutationFn: TaskApi.delete(projectId)
-  });
-
-  const { mutate: updateColumn } = useMutation<
-    BoardColumnResponse,
-    Error,
-    UpdateBoardColumnRequest
-  >({
-    mutationFn: updateBoardColumn(projectId)
-  });
+  const { mutate: createTask } = useMutation(TaskApi.create(projectId));
+  const { mutate: updateTask } = useMutation(TaskApi.update(projectId));
+  const { mutate: deleteTask } = useMutation(TaskApi.delete(projectId));
+  const { mutate: updateColumn } = useMutation(BoardColumnApi.update(projectId));
 
   const handleTaskCreated = (title: string) => {
     createTask(

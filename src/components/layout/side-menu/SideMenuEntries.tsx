@@ -67,13 +67,6 @@ export function createLoggedInTopSideMenuEntries(
 }
 
 export function createLoggedInBottomSideMenuEntries(navigate: NavigateFunction): MenuItem[] {
-  const settings: MenuItem = {
-    label: 'Settings',
-    icon: <SettingOutlined />,
-    key: 'settings',
-    onClick: () => navigate('/settings' ?? '/')
-  };
-
   const profile: MenuItem = {
     label: 'Profile',
     icon: <UserOutlined />,
@@ -88,7 +81,7 @@ export function createLoggedInBottomSideMenuEntries(navigate: NavigateFunction):
     onClick: () => navigate('/auth/logout' ?? '/')
   };
 
-  return Array.of(settings, profile, logout);
+  return Array.of(profile, logout);
 }
 
 export function createLoggedOutTopSideMenuEntries(navigate: NavigateFunction): MenuItem[] {
