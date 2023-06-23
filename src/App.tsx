@@ -1,13 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Overview } from './components/layout/Overview';
 import { PathContextProvider } from './context/PathContext';
 import { HomePage } from './views/home/HomePage';
 import { Profile } from './views/user/Profile';
 import { BoardView } from './views/board/BoardView';
-import { Settings } from './views/settings/Settings';
 import { Organisations } from './views/organisations/Organisations';
 import { Projects } from './views/projects/Projects';
 import { NotFound } from './views/NotFound';
@@ -81,7 +79,6 @@ export const App: React.FC = () => {
             </Route>
           </Routes>
         </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </PathContextProvider>
   );
